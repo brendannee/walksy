@@ -13,17 +13,44 @@
   
   
   <div data-role="page" data-theme="b" id="home"> 
-    <div> 
-      <div class="logo">Walksy.com</div> 
-      <h4 style="margin:2px 5px 0 5px;">San Francisco Walking Tours</h4>
+    <div data-role="header">
+      <div class="logo">Walksy.com - San Francisco Walking Tours</div>
     </div> 
 
-    <div data-role="content" style="padding-top:0;"> 
-      <form id="inputs" style="margin:0;" method="post" action="">
+    <div data-role="content"> 
+      <form id="inputs" method="post" action="">
         <label for="startbox">Where should your walking tour start?</label>
-        <input id="startbox" name="startbox" type="text" class="textbox" placeholder="Concord, CA"  title="Enter your starting address, city, zip or intersection" tabindex="1">
+        <input id="startbox" name="startbox" type="text" class="textbox" placeholder="Moscone Center, SF"  title="Enter your starting address, intersection or landmark" tabindex="1"><br>
+        <!--<div data-role="fieldcontain">
+          <label for="slider">How far would you like to walk:</label>
+          <input type="range" name="slider" id="slider" value="5" min="1" max="40"  />
+        </div>-->
+        <!--<div data-role="fieldcontain" id="tags">
+          <fieldset data-role="controlgroup">
+            <legend>What types of things would you like to see or do?</legend>
+            <input type="checkbox" name="architecture" id="architecture" class="custom" />
+            <label for="architecture">Architecture</label>
+            <input type="checkbox" name="traditional" id="traditional" class="custom" checked />
+            <label for="traditional">Classic SF</label>
+            <input type="checkbox" name="history" id="history" class="custom" />
+            <label for="history">History</label>
+            <input type="checkbox" name="museum" id="museum" class="custom" />
+            <label for="museum">Museum</label>
+            <input type="checkbox" name="neighborhood" id="neighborhood" class="custom" />
+            <label for="neighborhood">Neighborhood</label>
+            <input type="checkbox" name="parks" id="parks" class="custom" checked />
+            <label for="parks">Parks</label>
+            <input type="checkbox" name="shopping" id="shopping" class="custom" />
+            <label for="shopping">Shopping</label>
+            <input type="checkbox" name="sports" id="sports" class="custom" />
+            <label for="sports">Sports</label>
+            <input type="checkbox" name="views" id="views" class="custom" />
+            <label for="views">Views</label>
+          </fieldset>
+        </div>-->
+        
+        <input id="submit" type="submit" value="Plan my Walk" title="Plan my Walk">
       </form>
-      <a href="#map">Map</a>
     </div> 
     <div data-role="footer">
       <a href="#credits" data-role="button" data-icon="info">Credits</a>
@@ -35,13 +62,6 @@
       <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
       <h1>Map</h1>
       <a href="#directions" data-role="button" data-icon="arrow-d" data-iconpos="right" data-transition="slidedown">Directions</a>
-      <div data-role="navbar" class="safety">
-        <ul>
-          <li><a href="#" data-role="button" class="safe">Safe</a></li>
-          <li><a href="#" data-role="button" class="safer">Safer</a></li>
-          <li><a href="#" data-role="button" class="safest">Safest</a></li>
-        </ul>
-      </div>
     </div>
     <div id="map_canvas" data-role="content" style="padding:0;"></div>
     <div id="profile"></div>
@@ -56,22 +76,8 @@
       <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
       <h1>Directions</h1>
       <a href="#map" data-role="button" data-icon="arrow-u" data-iconpos="right" data-transition="slidedown" data-direction="reverse">Map</a>
-      <div data-role="navbar" class="safety">
-        <ul>
-          <li><a href="#" data-role="button" class="safe">Safe</a></li>
-          <li><a href="#" data-role="button" class="safer">Safer</a></li>
-          <li><a href="#" data-role="button" class="safest">Safest</a></li>
-        </ul>
-      </div>
     </div>
-    <div data-role="content">
-      <h3 id="directionsname"></h3>
-      <div id="resultsBox">
-        <div id="stats0" class="stats"></div>
-        <div id="stats1" class="stats"></div>
-        <div id="stats2" class="stats"></div>
-        <div id="directionslist"><ol></ol></div>
-      </div>
+    <div data-role="content" class="content">
     </div>
   </div>
   

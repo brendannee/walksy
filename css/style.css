@@ -21,7 +21,7 @@ body{
 
 #map-buttons{
   position:absolute;
-  top:79px;
+  top:46px;
   right:129px;
 }
 
@@ -57,4 +57,21 @@ body{
   color:#000;
   text-decoration:none;
   text-shadow:none;
+}
+
+#startbox{
+  clear:both;
+}
+
+label{
+  clear:both;
+}
+
+.ui-field-contain{
+  padding:0.5em 0 !important;
+}
+
+.error{
+  border-color:#b22828 !important;
+  background-color:#ffd5d5 !important;
 }

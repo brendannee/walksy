@@ -1,3 +1,11 @@
+var tagList = ["traditional", "architecture", "history", "museum", "neighborhood", "parks", "shopping", "views"];
+var map;
+var geocoder;
+var directionsDisplay;
+var infoWindow;
+var lastWindow;
+var markerArray = [];
+
 $.extend({
   //Extends jQuery to get parameters from URL
   getUrlVars: function(){
@@ -48,80 +56,68 @@ function getGeoLocator(position) {
   
 function showGeoLocatorError(error){
   if(error.code==1){
-    alert("To determine your current location you must click \"Share Location\" in the top bar in your browser.");
+    console.log("To determine your current location you must click \"Share Location\" in the top bar in your browser.");
   } else if (error.code==2 || error.code==3 || error.code==0){
-    alert("Your current location couldn't be determined.  Please enter the start and end locations manually.");
+    console.log("Your current location couldn't be determined.  Please enter the start and end locations manually.");
   } 
 }
 
 function submitForm() {
   // Redraws map based on info in the form
-  if(mobile){
-    $('#inputs input').blur();
-    $.mobile.pageLoading();	
-  }
+  $('#inputs input').blur();
+  $.mobile.pageLoading();	
+  
   var start = $('#startbox').val();
-  var end = $('#finishbox').val();
-  var hill = $('#hills').val();
+  var tags = $('#tags :checked');
 
   //Validate inputs
   if(start==''){
     $('#startbox').addClass('error');
-    if(mobile){
-      $('#startbox').focus();
-      $.mobile.pageLoading(true);	
-    }
+    $('#startbox').focus();
+    $.mobile.pageLoading(true);	
     return false;
   } else {$('#startbox').removeClass('error');}
-  if(end==''){
-    $('#finishbox').addClass('error');
-    if(mobile){
-      $('#finishbox').focus();
-      $.mobile.pageLoading(true);	
-    }
+  
+  /*if(tags.length < 1){
+    $('#tags label').addClass('error');
+    $('#tags .ui-controlgroup-controls').prepend('<div class="error">Check at least one category</div>');
+    $.mobile.pageLoading(true);
     return false;
-  } else {$('#finishbox').removeClass('error');}
-
-  //Search for Richmond, if found add usa to end to avoid confusion with Canada
-  if (start.search(/richmond/i) != -1) {
-    start = start + ", usa";
-  }
-  if (end.search(/richmond/i) != -1) {
-    end = end + ", usa";
-  }
+  }*/
 
   geocoder = new google.maps.Geocoder();
   geocoder.geocode({address:start}, function(results, status){
     if (status == google.maps.GeocoderStatus.OK) {
-      var lat1 = results[0].geometry.location.lat();
-      var lng1 = results[0].geometry.location.lng();
-      //Now geocode end address
-      geocoder.geocode({address:end}, function(results, status){
-        if (status == google.maps.GeocoderStatus.OK) {
-          var lat2 = results[0].geometry.location.lat();
-          var lng2 = results[0].geometry.location.lng();
-          //Now move along
-          if(checkBounds(lat1,lng1,lat2,lng2)){
-            // Draw 3 paths, one for each safety level
-            drawpath(lat1, lng1, lat2, lng2, hill, "low", true);
-            drawpath(lat1, lng1, lat2, lng2, hill, "medium", true);
-            drawpath(lat1, lng1, lat2, lng2, hill, "high", true);
-            
-            map.panTo(new google.maps.LatLng((lat1+lat2)/2,(lng1+lng2)/2));
-            
-            if(mobile){
-              $.mobile.pageLoading( true );
-              $.mobile.changePage($('#map'),"slide");
-            }
-            
-          } else {
-            alert("Bikemapper currently only works in the Bay Area.  Try making your addresses more specific by adding city and state names.");
-          }
-        } else {
-          alert(end + " not found");
-          return false;
-        }
+      
+      $.mobile.pageLoading( true );
+      $.mobile.changePage($('#map'),"slide");
+      
+      //Wait for pageload
+      $('#map').live('pageshow',function(event, ui){
+        //create start/end marker
+         var start_marker = new google.maps.Marker({
+             map: map, 
+             position: results[0].geometry.location,
+             draggable:true,
+             icon:  new google.maps.MarkerImage("images/green.png")
+         });
+
+         google.maps.event.addListener(start_marker, 'click', function(event) {
+           if(lastWindow) lastWindow.close(); //close the last window if it exists
+           lastWindow = new google.maps.InfoWindow( {
+             position: results[0].geometry.location,
+             content: '<strong>Start and End Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
+           });
+           lastWindow.open(map);
+         });
+
+         google.maps.event.addListener(start_marker, 'dragend', function(position) {
+            displayRoute(position.latLng);
+         });
+         
+        displayRoute(results[0].geometry.location);
       });
+
     } else {
       alert(start + " not found");
       return false;
@@ -308,13 +304,29 @@ function launchMap(){
 
       ]
     }
-  ]
+  ];
+  
+  directionsOptions = {
+    map: null,
+    draggable: true,
+    suppressMarkers: true,
+    markerOptions: {
+    zIndex: 100
+    }
+  };
   
   map = new google.maps.Map(document.getElementById("map_canvas"), {
     zoom: 12,
     center: new google.maps.LatLng(37.777, -122.419),
     mapTypeId: google.maps.MapTypeId.ROADMAP
   });
+  
+  geocoder = new google.maps.Geocoder();
+  
+  infoWindow = new google.maps.InfoWindow();
+  
+  
+  directionsDisplay = new google.maps.DirectionsRenderer(directionsOptions);
   
   var  styledMapOptions = {
     name: "walking"
@@ -325,17 +337,17 @@ function launchMap(){
   map.mapTypes.set('walking', walkingMapType);
   map.setMapTypeId('walking');
   
-  var tableid = 610588;
-  var layer = new google.maps.FusionTablesLayer(tableid,{
-    }
-  );
   
-  var query = "SELECT address FROM "+tableid+" WHERE tags contains ignoring case 'museum'";
+  /*var tags = ["shopping", "museum", "parks"];
+  
+  var query = "SELECT address FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG(37.777,-122.419)) LIMIT 1";
+  
+  console.log(query);
   
   layer.setQuery(query);
-  
   console.log(layer);
   layer.setMap(map);
+  
   
   //add a click listener to the layer
   google.maps.event.addListener(layer, 'click', function(e) {
@@ -344,6 +356,108 @@ function launchMap(){
     e.infoWindowHtml = '<strong>'+e.row['name'].value + "</strong><br>";
     e.infoWindowHtml += e.row['address'].value+'<br>';
     e.infoWindowHtml += 'Tags: '+e.row['tags'].value;
+  });*/
+  
+  /*$.getJSON('http://walksy.com/php/getPoints.php?tags=parks,museum&latlng=37.777,-122.419&callback=?',function(result){
+    console.log(result);
+    $.each(result, function())
+  });*/
+}
+
+function makeMarker(options){
+  console.log(options.content);
+   var pushPin = new google.maps.Marker({map:map,icon:new google.maps.MarkerImage("images/icon.png",null,null,new google.maps.Point(16,16))});
+   pushPin.setOptions(options);
+   google.maps.event.addListener(pushPin, 'click', function(){
+     if(lastWindow) lastWindow.close();
+     infoWindow.setOptions(options);
+     lastWindow = infoWindow.open(map, pushPin);
+   });
+   markerArray.push(pushPin);
+   return pushPin;
+ }
+
+function displayRoute(start){  
+
+  var tableid = 611081;
+  
+  //Reset Points
+  for(i in markerArray){
+    markerArray[i].setMap(null);
+  }
+  markerArray = [];
+  var points = [];
+  directionsDisplay.setMap(null);
+  
+  if(lastWindow) lastWindow.close(); //close the last window if it exists
+  
+  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) LIMIT 8"));
+  query.send(function(response){
+    
+    numRows = response.getDataTable().getNumberOfRows();
+    numCols = response.getDataTable().getNumberOfColumns();
+    
+    var limit = numRows;
+
+    //create an array of row values
+    for (var i = 0; i < numRows; i++) {
+      var row = [];
+      for (var j = 0; j < numCols; j++) {
+        row.push(response.getDataTable().getValue(i, j));
+      }
+      (function(row){
+        geocoder.geocode( { 'address': row[1] }, function(results, status) {
+          console.log(row);
+          if (status == google.maps.GeocoderStatus.OK) {
+            var coordinate = results[0].geometry.location;
+
+            //create the marker
+            makeMarker({
+              position:coordinate,
+              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2]
+            });
+
+            points.push({coordinate:coordinate,data:row});
+          }
+          limit -= 1;
+          //Check if loop is done, them move on
+          if(limit==0) {
+            var trip = {
+              points: points,
+              start: start
+            };
+            getDirections(trip);
+          }
+        });
+      })(row);
+    }
+  });
+}
+
+function getDirections(trip){
+  console.log(trip)
+  var DirectionsService = new google.maps.DirectionsService();
+
+  //Create waypoints
+  var waypoints = new Array();
+  $.each(trip.points, function(index, value){
+    waypoints.push({
+      location: value.coordinate
+    });
+  });
+
+  var request = {
+   origin: trip.start,
+   destination: trip.start,
+   waypoints: waypoints,
+   optimizeWaypoints: true,
+   travelMode: google.maps.DirectionsTravelMode.WALKING
+  };
+  DirectionsService.route(request, function(response, status) {
+   if (status == google.maps.DirectionsStatus.OK) {
+     directionsDisplay.setDirections(response);
+     directionsDisplay.setMap(map);
+   }
   });
 }
 
