@@ -391,6 +391,10 @@ function displayRoute(start){
   
   if(lastWindow) lastWindow.close(); //close the last window if it exists
   
+  $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent(start.lat()+","+start.lng()));
+  
+  $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=http://walksy.com/" + encodeURIComponent(start.lat()+","+start.lng()) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+  
   var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) LIMIT 8"));
   query.send(function(response){
     
@@ -414,7 +418,8 @@ function displayRoute(start){
             //create the marker
             makeMarker({
               position:coordinate,
-              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2]
+              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2],
+              pixelOffset: new google.maps.Size(0,16)
             });
 
             points.push({coordinate:coordinate,data:row});
@@ -433,6 +438,7 @@ function displayRoute(start){
     }
   });
 }
+
 
 function getDirections(trip){
   var DirectionsService = new google.maps.DirectionsService();
@@ -478,7 +484,59 @@ function getDirections(trip){
        }
      });
      
+     getElevation(response);
+     
    }
+  });
+}
+
+function getElevation(response){
+  var elevationService = new google.maps.ElevationService();
+  // Create a new chart in the elevation_chart DIV.
+  chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
+  
+  elevationService.getElevationAlongPath({path: response.routes[0].overview_path, samples:200}, function(results, status){
+    if (status == google.maps.ElevationStatus.OK) {
+      elevations = results;
+      
+      // Extract the elevation samples from the returned results
+      // and store them in an array of LatLngs.
+      var elevationPath = [];
+      for (var i = 0; i < results.length; i++) {
+        elevationPath.push(elevations[i].location);
+      }
+
+      // Display a polyline of the elevation path.
+      var pathOptions = {
+        path: elevationPath,
+        strokeColor: '#0000CC',
+        opacity: 0.4,
+        map: map
+      }
+      //polyline = new google.maps.Polyline(pathOptions);
+
+      // Extract the data from which to populate the chart.
+      // Because the samples are equidistant, the 'Sample'
+      // column here does double duty as distance along the
+      // X axis.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Sample');
+      data.addColumn('number', 'Elevation');
+      for (var i = 0; i < results.length; i++) {
+        data.addRow(['', elevations[i].elevation*3.2808399]);
+      }
+
+      // Draw the chart using the data within its DIV.
+      document.getElementById('elevation_chart').style.display = 'block';
+      chart.draw(data, {
+        width: $(window).width(),
+        height: 100,
+        legend: 'none',
+        titleY: 'Elevation (ft)'
+      });
+      
+      console.log(results);
+    }
   });
 }
 
