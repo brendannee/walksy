@@ -64,11 +64,20 @@
       <a href="#directions" data-role="button" data-icon="arrow-d" data-iconpos="right" data-transition="slidedown">Directions</a>
     </div>
     <div id="map_canvas" data-role="content" style="padding:0;"></div>
-    <div id="elevation_chart"></div>
+    <div id="elevation_chart"><h2>Loading Elevation Profile...</h2></div>
     <div id="map-buttons">
       <div id="permalink" class="map-button"><a href='' title='Direct Link to this route' rel='external'><img src='images/link.png'> Permalink</a></div>
       <div id="twitter" class="map-button"><a href='' rel='external'><img src='images/twitter.png'> Tweet This</a></div>
     </div>
+  </div>
+  
+  <div data-role="page" data-theme="a" id="streetview" style="height:100%">
+    <div data-role="header">
+      <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
+      <h1>Streetview</h1>
+      <a href="#map" data-role="button" data-icon="arrow-d" data-iconpos="right" data-transition="slidedown">Map</a>
+    </div>
+    <div id="pano" data-role="content" style="padding:0;"></div>
   </div>
   
   <div data-role="page" data-theme="a" id="directions">

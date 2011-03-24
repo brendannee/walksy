@@ -22,7 +22,7 @@ body{
 #map-buttons{
   position:absolute;
   top:46px;
-  right:129px;
+  right:135px;
 }
 
 .map-button{
@@ -74,4 +74,13 @@ label{
 .error{
   border-color:#b22828 !important;
   background-color:#ffd5d5 !important;
+}
+
+#elevation_chart{
+  height:100px;
+}
+
+#pano{
+  height:100%;
+  width:100%;
 }

@@ -145,7 +145,7 @@ function resizeMobile(){
     }
   } else {
     //Not iphone
-    if($(window).height()>500){
+    if($(window).height()>300 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
       //Show profile if enough room ans SVG supported
       mapheight = $(window).height()-100-parseInt($('#map .ui-header').css('height'));
     } else {
@@ -423,7 +423,7 @@ function displayRoute(start){
             //create the marker
             makeMarker({
               position:coordinate,
-              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2],
+              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2] + '<br><a href="" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a>',
               pixelOffset: new google.maps.Size(0,16)
             });
 
@@ -436,9 +436,6 @@ function displayRoute(start){
               points: points,
               start: start
             };
-            
-            //Remove loading screen
-            $.mobile.pageLoading( true );
             
             getDirections(trip);
           }
@@ -473,6 +470,9 @@ function getDirections(trip){
      directionsDisplay.setDirections(response);
      directionsDisplay.setMap(map);
      
+     //Remove loading screen
+     $.mobile.pageLoading( true );
+     
      //Do directions
      $('#directions .content').html('');
      $.each(response.routes[0].legs, function(index, leg){
@@ -483,6 +483,7 @@ function getDirections(trip){
          } else {
            $('#directions .content').append('<h2>'+(index)+' '+trip.points[waypointID].data[0]+'</h2>');
          }
+         $('#directions .content').append('<a href="" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))">StreetView</a>');
          $('#directions .content').append('<ul>');
          $.each(leg.steps, function(index, step){
            $('#directions .content').append('<li>'+step.instructions+'</li>');
@@ -549,11 +550,24 @@ function getElevation(response){
   });
 }
 
+function streetView(position) {
+  var panoramaOptions = {
+    position:position,
+    pov: {
+      heading: 165,
+      pitch:0,
+      zoom:1
+    }
+  };
+  var myPano = new google.maps.StreetViewPanorama(document.getElementById("pano"), panoramaOptions);
+  if($.mobile.activePage.attr('id')!='streetview'){
+    $.mobile.changePage($('#streetview'),"slide");
+  }
+  myPano.setVisible(true);
+}
+
 
 google.setOnLoadCallback(function(){
-  
-  //Hide top address bar
-  window.top.scrollTo(0, 1);
 
   launchMap();
 
