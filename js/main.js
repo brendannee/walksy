@@ -143,6 +143,7 @@ function resizeMobile(){
     } else {
       mapheight = $(window).height()+60-parseInt($('#map .ui-header').css('height'));
     }
+    panoheight = $(window).height()+60-parseInt($('#streetview .ui-header').css('height'));
   } else {
     //Not iphone
     if($(window).height()>300 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
@@ -151,9 +152,11 @@ function resizeMobile(){
     } else {
       mapheight = $(window).height()-parseInt($('#map .ui-header').css('height'));
     }
+    panoheight = $(window).height()-parseInt($('#streetview .ui-header').css('height'));
   }
   $("#map_canvas").css('height',mapheight);
   $("#map").css('height',$(window).height());
+  $("#pano").css('height',panoheight);
   google.maps.event.trigger(map,'resize');
 }
 
@@ -342,35 +345,9 @@ function launchMap(){
   map.mapTypes.set('walking', walkingMapType);
   map.setMapTypeId('walking');
   
-  
-  /*var tags = ["shopping", "museum", "parks"];
-  
-  var query = "SELECT address FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG(37.777,-122.419)) LIMIT 1";
-  
-  console.log(query);
-  
-  layer.setQuery(query);
-  console.log(layer);
-  layer.setMap(map);
-  
-  
-  //add a click listener to the layer
-  google.maps.event.addListener(layer, 'click', function(e) {
-    console.log(e)
-    //update the content of the InfoWindow
-    e.infoWindowHtml = '<strong>'+e.row['name'].value + "</strong><br>";
-    e.infoWindowHtml += e.row['address'].value+'<br>';
-    e.infoWindowHtml += 'Tags: '+e.row['tags'].value;
-  });*/
-  
-  /*$.getJSON('http://walksy.com/php/getPoints.php?tags=parks,museum&latlng=37.777,-122.419&callback=?',function(result){
-    console.log(result);
-    $.each(result, function())
-  });*/
 }
 
 function makeMarker(options){
-  console.log(options.content);
    var pushPin = new google.maps.Marker({map:map,icon:new google.maps.MarkerImage("images/icon.png",null,null,new google.maps.Point(16,16))});
    pushPin.setOptions(options);
    google.maps.event.addListener(pushPin, 'click', function(){
@@ -416,14 +393,13 @@ function displayRoute(start){
       }
       (function(row, i){
         geocoder.geocode( { 'address': row[1] }, function(results, status) {
-          console.log(row);
           if (status == google.maps.GeocoderStatus.OK) {
             var coordinate = results[0].geometry.location;
 
             //create the marker
             makeMarker({
               position:coordinate,
-              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2] + '<br><a href="" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a>',
+              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2] + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a>',
               pixelOffset: new google.maps.Size(0,16)
             });
 
@@ -465,13 +441,10 @@ function getDirections(trip){
    travelMode: google.maps.DirectionsTravelMode.WALKING
   };
   DirectionsService.route(request, function(response, status) {
-    console.log(response);
    if (status == google.maps.DirectionsStatus.OK) {
      directionsDisplay.setDirections(response);
      directionsDisplay.setMap(map);
      
-     //Remove loading screen
-     $.mobile.pageLoading( true );
      
      //Do directions
      $('#directions .content').html('');
@@ -483,7 +456,7 @@ function getDirections(trip){
          } else {
            $('#directions .content').append('<h2>'+(index)+' '+trip.points[waypointID].data[0]+'</h2>');
          }
-         $('#directions .content').append('<a href="" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))">StreetView</a>');
+         $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))">StreetView</a>');
          $('#directions .content').append('<ul>');
          $.each(leg.steps, function(index, step){
            $('#directions .content').append('<li>'+step.instructions+'</li>');
@@ -545,25 +518,27 @@ function getElevation(response){
         titleY: 'Elevation (ft)'
       });
       
-      console.log(results);
+      //Remove loading screen
+      $.mobile.pageLoading( true );
+      
     }
   });
 }
 
 function streetView(position) {
-  var panoramaOptions = {
-    position:position,
-    pov: {
-      heading: 165,
-      pitch:0,
-      zoom:1
-    }
-  };
-  var myPano = new google.maps.StreetViewPanorama(document.getElementById("pano"), panoramaOptions);
-  if($.mobile.activePage.attr('id')!='streetview'){
-    $.mobile.changePage($('#streetview'),"slide");
-  }
-  myPano.setVisible(true);
+  //Wait for pageload
+  $('#streetview').live('pageshow',function(event, ui){
+    var panoramaOptions = {
+      position:position,
+      pov: {
+        heading: 165,
+        pitch:0,
+        zoom:1
+      }
+    };
+    var myPano = new google.maps.StreetViewPanorama(document.getElementById("pano"), panoramaOptions);
+    myPano.setVisible(true);
+  });
 }
 
 
@@ -573,6 +548,8 @@ google.setOnLoadCallback(function(){
 
   //Resize map when map page is shown
   $("#map_canvas").parent().bind('pageshow',resizeMobile);
+  
+  $("#pano").parent().bind('pageshow',resizeMobile);
   
   //Resize map when orientation is changed
   $(window).bind('resize',function(e){

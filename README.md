@@ -13,6 +13,7 @@ Walksy makes walking tours of interesting things in San Francisco based on a spe
 * Custom Styled Map
 * Powered by Google Fusion Tables
 * Smart optimized routing between all points of interest
+* Google Streetview for points of interest
 
 ### Credits
 
