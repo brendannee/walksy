@@ -28,12 +28,12 @@ function detectRouteFromURL(){
   //Detect saved route from URL
   if($.getUrlVar('start')!=undefined && $.getUrlVar('end')!=undefined){
     $('#startbox').val($.getUrlVar('start').replace(/\+/g,' '));
-    $('#finishbox').val($.getUrlVar('end').replace(/\+/g,' '));
-    // Strip off trailing #
-    if($.getUrlVar('hill')!=undefined) {
-     $('#hills').val($.getUrlVar('hill').replace(/#/g,''));
-    }
     submitForm();
+  } else {
+    //Show Homepage
+    if($.mobile.activePage.attr('id')!='home'){
+      $.mobile.changePage($('#home'),"slide");
+    }
   }
 }
 
@@ -435,7 +435,6 @@ function displayRoute(start){
 }
 
 function getDirections(trip){
-  console.log(trip)
   var DirectionsService = new google.maps.DirectionsService();
 
   //Create waypoints
@@ -454,9 +453,31 @@ function getDirections(trip){
    travelMode: google.maps.DirectionsTravelMode.WALKING
   };
   DirectionsService.route(request, function(response, status) {
+    console.log(response);
    if (status == google.maps.DirectionsStatus.OK) {
      directionsDisplay.setDirections(response);
      directionsDisplay.setMap(map);
+     
+     //Do directions
+     $('#directions .content').html('');
+     $.each(response.routes[0].legs, function(index, leg){
+       if(index<response.routes[0].legs.length-1){
+         var waypointID = response.routes[0].optimized_waypoint_order[index-1];
+         if(index==0){
+           $('#directions .content').append('<h2>Start at '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2>');
+         } else {
+           $('#directions .content').append('<h2>'+(index)+' '+trip.points[waypointID].data[0]+'</h2>');
+         }
+         $('#directions .content').append('<ul>');
+         $.each(leg.steps, function(index, step){
+           $('#directions .content').append('<li>'+step.instructions+'</li>');
+         })
+         $('#directions .content').append('</ul>');
+       } else {
+         
+       }
+     });
+     
    }
   });
 }
@@ -479,6 +500,7 @@ google.setOnLoadCallback(function(){
   });
 
   detectRouteFromURL();
+  
   if(navigator.geolocation) {  
     navigator.geolocation.getCurrentPosition(getGeoLocator,showGeoLocatorError);
   }
