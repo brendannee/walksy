@@ -32,7 +32,7 @@ body{
   -webkit-user-select: none; 
   font-size: 12px; 
   line-height: 160%; 
-  padding: 0px 6px;
+  padding: 0px 4px;
   -webkit-box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px; 
   box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px; 
   min-width: 47px; 

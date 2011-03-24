@@ -26,13 +26,16 @@ $.extend({
 
 function detectRouteFromURL(){
   //Detect saved route from URL
-  if($.getUrlVar('start')!=undefined && $.getUrlVar('end')!=undefined){
-    $('#startbox').val($.getUrlVar('start').replace(/\+/g,' '));
+  if($.getUrlVar('start')!=undefined){
+    $('#startbox').val(decodeURIComponent($.getUrlVar('start').replace(/\+/g,' ')));
     submitForm();
   } else {
     //Show Homepage
     if($.mobile.activePage.attr('id')!='home'){
       $.mobile.changePage($('#home'),"slide");
+    }
+    if(navigator.geolocation) {  
+      navigator.geolocation.getCurrentPosition(getGeoLocator,showGeoLocatorError);
     }
   }
 }
@@ -89,8 +92,10 @@ function submitForm() {
   geocoder.geocode({address:start}, function(results, status){
     if (status == google.maps.GeocoderStatus.OK) {
       
-      $.mobile.pageLoading( true );
       $.mobile.changePage($('#map'),"slide");
+      
+      //Show loading
+      $.mobile.pageLoading();
       
       //Wait for pageload
       $('#map').live('pageshow',function(event, ui){
@@ -140,7 +145,7 @@ function resizeMobile(){
     }
   } else {
     //Not iphone
-    if($(window).height()>500 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
+    if($(window).height()>500){
       //Show profile if enough room ans SVG supported
       mapheight = $(window).height()-100-parseInt($('#map .ui-header').css('height'));
     } else {
@@ -391,9 +396,9 @@ function displayRoute(start){
   
   if(lastWindow) lastWindow.close(); //close the last window if it exists
   
-  $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent(start.lat()+","+start.lng()));
+  $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent($('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
   
-  $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=http://walksy.com/" + encodeURIComponent(start.lat()+","+start.lng()) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+  $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
   
   var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) LIMIT 8"));
   query.send(function(response){
@@ -409,7 +414,7 @@ function displayRoute(start){
       for (var j = 0; j < numCols; j++) {
         row.push(response.getDataTable().getValue(i, j));
       }
-      (function(row){
+      (function(row, i){
         geocoder.geocode( { 'address': row[1] }, function(results, status) {
           console.log(row);
           if (status == google.maps.GeocoderStatus.OK) {
@@ -431,10 +436,14 @@ function displayRoute(start){
               points: points,
               start: start
             };
+            
+            //Remove loading screen
+            $.mobile.pageLoading( true );
+            
             getDirections(trip);
           }
         });
-      })(row);
+      })(row, i);
     }
   });
 }
@@ -558,10 +567,6 @@ google.setOnLoadCallback(function(){
   });
 
   detectRouteFromURL();
-  
-  if(navigator.geolocation) {  
-    navigator.geolocation.getCurrentPosition(getGeoLocator,showGeoLocatorError);
-  }
   
   $('#inputs').submit(submitForm)
   
