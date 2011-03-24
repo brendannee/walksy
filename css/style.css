@@ -1,0 +1,60 @@
+html { height: 100% }
+body{
+  display:none;
+  font-family:Arimo, helvetica, arial, sans-serif;
+  margin:0;
+  height: 100%;
+}
+
+#ui-page-start, #ui-page-start > .ui-content { height: 100% }
+
+#map{
+  overflow-y:hidden;
+}  
+
+#map_canvas{
+  text-shadow:none;
+  width: 100%; 
+  height: 100%;
+  color:#333;
+}
+
+#map-buttons{
+  position:absolute;
+  top:79px;
+  right:129px;
+}
+
+.map-button{
+  overflow-x: hidden; 
+  overflow-y: hidden; 
+  text-align: center; 
+  -webkit-user-select: none; 
+  font-size: 12px; 
+  line-height: 160%; 
+  padding: 0px 6px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px; 
+  box-shadow: rgba(0, 0, 0, 0.347656) 2px 2px 3px; 
+  min-width: 47px; 
+  color: black; 
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(169, 187, 223);
+  border-radius: 2px 2px;
+  font-weight: normal; 
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(254, 254, 254)), to(rgb(243, 243, 243))); 
+  background-attachment: initial; 
+  background-origin: initial; 
+  background-clip: initial; 
+  background-color: initial; 
+  background-position: initial initial; 
+  background-repeat: initial initial;
+  display:inline-block;
+}
+
+.map-button a{
+  display:block;
+  color:#000;
+  text-decoration:none;
+  text-shadow:none;
+}

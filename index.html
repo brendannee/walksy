@@ -4,10 +4,9 @@
   <meta charset="utf-8">
   <title>Walksy.com - Walking Tours of San Francisco</title>
   <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
-  <link type="text/css" href="css/ui-lightness/jquery-ui-1.8.6.custom.css" rel="stylesheet" /> 
   <link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:regular,bold&amp;subset=latin' rel='stylesheet' type='text/css'>
   <meta name="description" content="Walksy.com leads you on great walking trips around San Francisco" />
-  <link rel="stylesheet" href="css/mobile.css" media="screen" />
+  <link rel="stylesheet" href="css/style.css" media="screen" />
   <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" media="screen" />
 </head>
 <body>
@@ -20,8 +19,11 @@
     </div> 
 
     <div data-role="content" style="padding-top:0;"> 
-      
-      Content
+      <form id="inputs" style="margin:0;" method="post" action="">
+        <label for="startbox">Where should your walking tour start?</label>
+        <input id="startbox" name="startbox" type="text" class="textbox" placeholder="Concord, CA"  title="Enter your starting address, city, zip or intersection" tabindex="1">
+      </form>
+      <a href="#map">Map</a>
     </div> 
     <div data-role="footer">
       <a href="#credits" data-role="button" data-icon="info">Credits</a>
