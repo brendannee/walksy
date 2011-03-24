@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Walksy.com - Walking Tours of San Francisco</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
+  <link type="text/css" href="css/ui-lightness/jquery-ui-1.8.6.custom.css" rel="stylesheet" /> 
+  <link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:regular,bold&amp;subset=latin' rel='stylesheet' type='text/css'>
+  <meta name="description" content="Walksy.com leads you on great walking trips around San Francisco" />
+  <link rel="stylesheet" href="css/mobile.css" media="screen" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" media="screen" />
+</head>
+<body>
+  
+  
+  <div data-role="page" data-theme="b" id="home"> 
+    <div> 
+      <div class="logo">Walksy.com</div> 
+      <h4 style="margin:2px 5px 0 5px;">San Francisco Walking Tours</h4>
+    </div> 
+
+    <div data-role="content" style="padding-top:0;"> 
+      
+      Content
+    </div> 
+    <div data-role="footer">
+      <a href="#credits" data-role="button" data-icon="info">Credits</a>
+    </div>
+  </div>
+  
+  <div data-role="page" data-theme="a" id="map">
+    <div data-role="header">
+      <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
+      <h1>Map</h1>
+      <a href="#directions" data-role="button" data-icon="arrow-d" data-iconpos="right" data-transition="slidedown">Directions</a>
+      <div data-role="navbar" class="safety">
+        <ul>
+          <li><a href="#" data-role="button" class="safe">Safe</a></li>
+          <li><a href="#" data-role="button" class="safer">Safer</a></li>
+          <li><a href="#" data-role="button" class="safest">Safest</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="map_canvas" data-role="content" style="padding:0;"></div>
+    <div id="profile"></div>
+    <div id="map-buttons">
+      <div id="permalink" class="map-button"><a href='" + linkURL + "' title='Direct Link to this route'><img src='images/link.png'> Permalink</a></div>
+      <div id="twitter" class="map-button"><a href=''><img src='images/twitter.png'> Tweet This</a></div>
+    </div>
+  </div>
+  
+  <div data-role="page" data-theme="a" id="directions">
+    <div data-role="header">
+      <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
+      <h1>Directions</h1>
+      <a href="#map" data-role="button" data-icon="arrow-u" data-iconpos="right" data-transition="slidedown" data-direction="reverse">Map</a>
+      <div data-role="navbar" class="safety">
+        <ul>
+          <li><a href="#" data-role="button" class="safe">Safe</a></li>
+          <li><a href="#" data-role="button" class="safer">Safer</a></li>
+          <li><a href="#" data-role="button" class="safest">Safest</a></li>
+        </ul>
+      </div>
+    </div>
+    <div data-role="content">
+      <h3 id="directionsname"></h3>
+      <div id="resultsBox">
+        <div id="stats0" class="stats"></div>
+        <div id="stats1" class="stats"></div>
+        <div id="stats2" class="stats"></div>
+        <div id="directionslist"><ol></ol></div>
+      </div>
+    </div>
+  </div>
+  
+  <div data-role="page" data-theme="b" id="credits">
+    <div data-role="header">
+      <h1>Credits</h1>
+    </div>
+    <div data-role="content">
+      <p>Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by <a href="http://bn.ee">Brendan Nee</a>.  The source code is <a href="https://github.com/brendannee/walksy">available on github</a>.</p>
+      <p>If you like this app, you might like some of the other transportation web apps Brendan has created:</p>
+      <ul>
+        <li><a href="http://bikesy.com">Bikesy.com</a> - customized bike route directions for the San Francisco Bay Area based on data from OpenStreetMap</li>
+        <li><a href="http://modepick.com">Modepick.com</a> - calculate the time, distance and cost for a trip including walking, biking, carshare, transit, taxi, Amtrak and Greyhound for any two points in the US.
+      </ul>
+    </div>
+  </div>
+  
+  
+  <script type="text/javascript" src="http://www.google.com/jsapi?key=ABQIAAAA7ryB86mtzsqx_XU57t8PNhTMTGztSySO4_rR2h0VlHQYebwNHBQfKBMwuobg9gRDpM6rxsFgfXCnug"></script>
+
+  <script type="text/javascript">
+    google.load("maps", "3.x",{"other_params":"sensor=true"});
+    google.load("jquery", "1.5.1");
+    google.load("jqueryui", "1.8.11");
+    google.load('visualization', '1', {packages:['corechart']});
+  </script>
+  
+  <script src="js/jquery.mobile-1.0a3.min.js"></script>
+  
+  <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-306190-17']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+  
+</body>
+</html>
