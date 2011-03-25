@@ -1,17 +1,20 @@
 Walksy
 =========
 
-Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by [Brendan Nee]http://bn.ee.  The source code is available on [github]https://github.com/brendannee/walksy.
+Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by [Brendan Nee](http://bn.ee).  The source code is available on [github](https://github.com/brendannee/walksy).
 
 Walksy makes walking tours of interesting things in San Francisco based on a specified start point.  It could be extended to work anywhere.
 
+## Demo ##
+
+A live Demo is available at [http://walksy.com](http://walksy.com)
 
 ### Features
 
 * Elevation Profiles (requires SVG support, not available on Android)
-* Smart Mobile layout using Jquery Mobile
+* Smart Mobile layout using [Jquery Mobile](http://jquerymobile.com/)
 * Custom Styled Map
-* Powered by Google Fusion Tables
+* Powered by Google [Fusion Tables](https://code.google.com/apis/fusiontables/)
 * Smart optimized routing between all points of interest
 * Google Streetview for points of interest
 
