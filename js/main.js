@@ -377,7 +377,10 @@ function displayRoute(start){
   
   $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
   
-  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) LIMIT 8"));
+  //Generate random number for query offset to randomize trips
+  var random = Math.floor(Math.random()*4);
+  
+  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) OFFSET " + random + " LIMIT 8"));
   query.send(function(response){
     
     numRows = response.getDataTable().getNumberOfRows();
