@@ -109,7 +109,9 @@ function submitForm() {
 
          google.maps.event.addListener(start_marker, 'click', function() {
            if(lastWindow) lastWindow.close(); //close the last window if it exists
+           if(infoWindow) infoWindow.close();
            lastWindow = new google.maps.InfoWindow( {
+             pixelOffset: new google.maps.Size(0,-32),
              position: results[0].geometry.location,
              content: '<strong>Start and End Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
            });
@@ -353,7 +355,7 @@ function makeMarker(options){
    google.maps.event.addListener(pushPin, 'click', function(){
      if(lastWindow) lastWindow.close(); //close the last window if it exists
      infoWindow.setOptions(options);
-     lastWindow = infoWindow.open(map, pushPin);
+     infoWindow.open(map, pushPin);
    });
    markerArray.push(pushPin);
    return pushPin;
