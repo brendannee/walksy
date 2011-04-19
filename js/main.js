@@ -166,6 +166,7 @@ function resizeMobile(){
   $("#map_canvas").css('height',mapheight);
   $("#map").css('height',$(window).height());
   $("#pano").css('height',panoheight);
+  $("#home").css('height',$(window).height());
   google.maps.event.trigger(map,'resize');
 }
 
@@ -490,14 +491,13 @@ function getDirections(trip){
          if(index==0){
            $('#directions .content').append('<h2>Start at '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2>');
          } else {
-           $('#directions .content').append('<h2>'+(index)+' '+trip.points[waypointID].data[0]+'</h2>');
+           $('#directions .content').append('<h2>' + index + '. ' + trip.points[waypointID].data[0] + '</h2>');
          }
-         $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))">StreetView</a>');
-         $('#directions .content').append('<ul>');
-         $.each(leg.steps, function(index, step){
-           $('#directions .content').append('<li>'+step.instructions+'</li>');
+         $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
+         $('#directions .content').append('<ul class="directions' + index + '"></ul>');
+         $.each(leg.steps, function(i, step){
+           $('#directions .content .directions'+index).append('<li>'+step.instructions+'</li>');
          })
-         $('#directions .content').append('</ul>');
        } else {
          
        }

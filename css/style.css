@@ -8,6 +8,21 @@ body{
 
 #ui-page-start, #ui-page-start > .ui-content { height: 100% }
 
+#home .ui-header, #home .ui-content, #home .ui-footer{
+  max-width:600px;
+  margin:0 auto;
+  border-left-width: 1px;
+  border-right-width: 1px;
+}
+
+.ui-page a{
+  color:white;
+}
+
+.logo{
+  padding:0 10px;
+}
+
 #map{
   overflow-y:hidden;
 }  
@@ -90,4 +105,15 @@ label{
 
 #pano{
   width:100%;
+}
+
+#directions h2{
+  margin-bottom:0;
+  display:inline;
+  padding-right:15px;
+}
+
+#directions .streetview{
+  font-size:11px;
+  color:#CCCCFF;
 }
