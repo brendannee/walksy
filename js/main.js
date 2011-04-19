@@ -1,10 +1,11 @@
-var tagList = ["traditional", "architecture", "history", "museum", "neighborhood", "parks", "shopping", "views"];
 var map;
 var geocoder;
 var directionsDisplay;
 var infoWindow;
 var lastWindow;
 var markerArray = [];
+var tagList = ["traditional", "architecture", "history", "museum", "neighborhood", "parks", "shopping", "views"];
+var tags =[];
 
 $.extend({
   //Extends jQuery to get parameters from URL
@@ -71,8 +72,11 @@ function submitForm() {
   $.mobile.pageLoading();	
   
   var start = $('#startbox').val();
-  var tags = $('#tags :checked');
-
+  tags = []; 
+  $('#tags :checked').each(function(){
+    tags.push($(this).attr('id'));
+  });
+  
   //Validate inputs
   if(start==''){
     $('#startbox').addClass('error');
@@ -81,6 +85,7 @@ function submitForm() {
     return false;
   } else {$('#startbox').removeClass('error');}
   
+  //Make sure at least one tag is checked
   /*if(tags.length < 1){
     $('#tags label').addClass('error');
     $('#tags .ui-controlgroup-controls').prepend('<div class="error">Check at least one category</div>');
@@ -119,7 +124,9 @@ function submitForm() {
          });
 
          google.maps.event.addListener(start_marker, 'dragend', function(position) {
-            displayRoute(position.latLng);
+           //Show loading screen
+           $.mobile.pageLoading();
+           displayRoute(position.latLng);
          });
          
         displayRoute(results[0].geometry.location);
@@ -362,7 +369,7 @@ function makeMarker(options){
  }
 
 function displayRoute(start){  
-
+  //Google Fusion Table ID
   var tableid = 611081;
   
   //Reset Points
