@@ -432,10 +432,9 @@ function getYelp(name){
     long: -122.399797,
     radius: 10,
     limit: 1,
-    ywsid: '00zW70MC_sCMJIpsokD0hQ',
-    callback:'cb'
+    ywsid: '00zW70MC_sCMJIpsokD0hQ'
   }
-  $.getJSON('http://api.yelp.com/business_review_search',options,function(data){
+  $.getJSON('http://api.yelp.com/business_review_search?&callback=?', options, function(data){
     console.log(data);
   });
 }
