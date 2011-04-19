@@ -107,7 +107,7 @@ function submitForm() {
              icon:  new google.maps.MarkerImage("images/green.png")
          });
 
-         google.maps.event.addListener(start_marker, 'click', function(event) {
+         google.maps.event.addListener(start_marker, 'click', function() {
            if(lastWindow) lastWindow.close(); //close the last window if it exists
            lastWindow = new google.maps.InfoWindow( {
              position: results[0].geometry.location,
@@ -351,7 +351,7 @@ function makeMarker(options){
    var pushPin = new google.maps.Marker({map:map,icon:new google.maps.MarkerImage("images/icon.png",null,null,new google.maps.Point(16,16))});
    pushPin.setOptions(options);
    google.maps.event.addListener(pushPin, 'click', function(){
-     if(lastWindow) lastWindow.close();
+     if(lastWindow) lastWindow.close(); //close the last window if it exists
      infoWindow.setOptions(options);
      lastWindow = infoWindow.open(map, pushPin);
    });
@@ -398,47 +398,56 @@ function displayRoute(start){
         geocoder.geocode( { 'address': row[1] }, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
             var coordinate = results[0].geometry.location;
-            getYelp(row[0]);
-            //create the marker
-            makeMarker({
-              position:coordinate,
-              content: '<strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2] + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a>',
-              pixelOffset: new google.maps.Size(0,16)
-            });
-
-            points.push({coordinate:coordinate,data:row});
-          }
-          limit -= 1;
-          //Check if loop is done, them move on
-          if(limit==0) {
-            var trip = {
-              points: points,
-              start: start
-            };
             
-            getDirections(trip);
+            //Yelp lookup
+            var options = {
+              term: row[0],
+              lat: coordinate.lat(),
+              long: coordinate.lng(),
+              radius: 1,
+              limit: 1,
+              ywsid: '00zW70MC_sCMJIpsokD0hQ'
+            }
+            $.getJSON('http://api.yelp.com/business_review_search?&callback=?', options, function(data){
+              //Check if any results then create the marker
+              if(data.businesses.length>0){
+                //Yelp had results, take the first one
+                yelp = data.businesses[0];
+              
+                makeMarker({
+                  position:coordinate,
+                  pixelOffset: new google.maps.Size(0,16),
+                  content: '<div id="marker' + i + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2]  + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a><br><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp"></a></div>'
+                });
+              } else {
+                //Couldn't find on yelp
+                makeMarker({
+                  position:coordinate,
+                  pixelOffset: new google.maps.Size(0,16),
+                  content: '<div id="marker' + i + '" class="marker"><strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2]  + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a></div>'
+                });
+              }
+
+              //Add to points array
+              points.push({coordinate:coordinate,data:row});
+              
+              limit -= 1;
+              //Check if loop is done, them move on
+              if(limit==0) {
+                var trip = {
+                  points: points,
+                  start: start
+                };
+
+                getDirections(trip);
+              }
+            });
           }
         });
       })(row, i);
     }
   });
 }
-
-function getYelp(name){
-  http://api.yelp.com/business_review_search?term=yelp&lat=37.788022&long=-122.399797&radius=10&limit=5&ywsid=XXXXXXXXXXXXXXXXXX
-  var options = {
-    term: name,
-    lat: 37.788022,
-    long: -122.399797,
-    radius: 10,
-    limit: 1,
-    ywsid: '00zW70MC_sCMJIpsokD0hQ'
-  }
-  $.getJSON('http://api.yelp.com/business_review_search?&callback=?', options, function(data){
-    console.log(data);
-  });
-}
-
 
 function getDirections(trip){
   var DirectionsService = new google.maps.DirectionsService();

@@ -59,6 +59,14 @@ body{
   text-shadow:none;
 }
 
+.marker .thumb{
+  float:left;
+  width:100px;
+  height:100px;
+  margin-right:4px;
+  margin-bottom:4px;
+}
+
 #startbox{
   clear:both;
 }
