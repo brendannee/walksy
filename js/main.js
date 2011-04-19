@@ -398,7 +398,7 @@ function displayRoute(start){
         geocoder.geocode( { 'address': row[1] }, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
             var coordinate = results[0].geometry.location;
-
+            getYelp(row[0]);
             //create the marker
             makeMarker({
               position:coordinate,
@@ -421,6 +421,22 @@ function displayRoute(start){
         });
       })(row, i);
     }
+  });
+}
+
+function getYelp(name){
+  http://api.yelp.com/business_review_search?term=yelp&lat=37.788022&long=-122.399797&radius=10&limit=5&ywsid=XXXXXXXXXXXXXXXXXX
+  var options = {
+    term: name,
+    lat: 37.788022,
+    long: -122.399797,
+    radius: 10,
+    limit: 1,
+    ywsid: '00zW70MC_sCMJIpsokD0hQ',
+    callback:'cb'
+  }
+  $.getJSON('http://api.yelp.com/business_review_search',options,function(data){
+    console.log(data);
   });
 }
 
@@ -547,6 +563,8 @@ function streetView(position) {
 
 google.setOnLoadCallback(function(){
 
+  resizeMobile();
+  
   launchMap();
 
   //Resize map when map page is shown
@@ -566,5 +584,4 @@ google.setOnLoadCallback(function(){
   
   $('body').show();
 
-  resizeMobile();
 });
