@@ -104,6 +104,9 @@ function submitForm() {
       
       //Wait for pageload
       $('#map').live('pageshow',function(event, ui){
+        //Recenter map on SF
+        map.setCenter(new google.maps.LatLng(37.777, -122.419));
+        
         //create start/end marker
          var start_marker = new google.maps.Marker({
              map: map, 
