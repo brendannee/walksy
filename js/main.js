@@ -4,6 +4,7 @@ var directionsDisplay;
 var infoWindow;
 var lastWindow;
 var markerArray = [];
+var points = [];
 var tagList = ["traditional", "architecture", "history", "museum", "neighborhood", "parks", "shopping", "views"];
 var tags =[];
 
@@ -371,22 +372,31 @@ function makeMarker(options){
    });
    markerArray.push(pushPin);
    return pushPin;
- }
+}
 
-function displayRoute(start){  
+function clearMap(){
   //Reset Points
   for(i in markerArray){
     markerArray[i].setMap(null);
   }
   markerArray = [];
-  var points = [];
+  points = [];
   directionsDisplay.setMap(null);
   
-  if(lastWindow) lastWindow.close(); //close the last window if it exists
-  
+  //close the last infowindow if it exists
+  if(lastWindow) lastWindow.close();
+}
+
+function generateLinks(){
   $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent($('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
-  
+
   $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+}
+
+function displayRoute(start){  
+  clearMap();
+  
+  generateLinks();
   
   //Generate random number for query offset to randomize trips
   var random = Math.floor(Math.random()*4);
@@ -394,8 +404,7 @@ function displayRoute(start){
   //Google Fusion Table ID
   var tableid = 611081;
   
-  var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) OFFSET " + random + " LIMIT 8"));
-  query.send(function(response){
+  new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) OFFSET " + random + " LIMIT 8")).send(function(response){
     
     numRows = response.getDataTable().getNumberOfRows();
     numCols = response.getDataTable().getNumberOfColumns();
