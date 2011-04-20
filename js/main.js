@@ -249,11 +249,11 @@ function launchMap(){
     icon:  new google.maps.MarkerImage("images/green.png")
   });
   
-  //Evenys for start marker
+  //Events for start marker
   google.maps.event.addListener(trip.startMarker, 'click', function(position) {
     if(lastWindow) lastWindow.close(); //close the last window if it exists
     infoWindow.setOptions({
-      content: '<strong>Walking tour start and end Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
+      content: '<strong>Walking tour start and end Location</strong>'
     });
     infoWindow.open(map, trip.startMarker);
   });
@@ -463,7 +463,7 @@ function getDirections(){
      
      //Add summary info
      
-     $('#directions .summary').html(Math.round(totalDistance/1609.344*10)/10 + " miles, " + Math.floor(totalDuration/60) + " minutes, " + response.routes[0].legs.length + " stops");
+     $('#directions .summary').html(Math.round(totalDistance/1609.344*10)/10 + " miles, " + Math.floor(totalDuration/60) + " minutes, " + (response.routes[0].legs.length-2) + " stops");
      
      //Create Points
      for (var i in trip.waypoints){
