@@ -462,8 +462,10 @@ function getDirections(){
      });
      
      //Add summary info
-     
-     $('#directions .summary').html(Math.round(totalDistance/1609.344*10)/10 + " miles, " + Math.floor(totalDuration/60) + " minutes, " + (response.routes[0].legs.length-2) + " stops");
+     trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
+     trip.duration = Math.floor(totalDuration/60) + " minutes";
+     $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-2) + " stops");
+     $('#map h1').html('Walking Tour (' + trip.distance + ')');
      
      //Create Points
      for (var i in trip.waypoints){
@@ -567,7 +569,8 @@ function getElevation(response){
         width: $(window).width(),
         height: 100,
         legend: 'none',
-        titleY: 'Elevation (ft)'
+        titleY: 'Elevation (ft)',
+        titleX: trip.distance
       });
       
       //Remove loading screen
