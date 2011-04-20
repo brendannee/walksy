@@ -3,10 +3,10 @@ var geocoder;
 var directionsDisplay;
 var infoWindow;
 var lastWindow;
-var markerArray = [];
-var points = [];
+var trip = {};
 var tagList = ["traditional", "architecture", "history", "museum", "neighborhood", "parks", "shopping", "views"];
 var tags =[];
+var limit;
 
 $.extend({
   //Extends jQuery to get parameters from URL
@@ -96,7 +96,7 @@ function submitForm() {
 
   geocoder = new google.maps.Geocoder();
   geocoder.geocode({address:start}, function(results, status){
-    if (status == google.maps.GeocoderStatus.OK) {
+    if(status == google.maps.GeocoderStatus.OK) {
       
       $.mobile.changePage($('#map'),"slide");
       
@@ -109,35 +109,34 @@ function submitForm() {
         map.setCenter(new google.maps.LatLng(37.777, -122.419));
         
         //create start/end marker
-         var start_marker = new google.maps.Marker({
-             map: map, 
-             position: results[0].geometry.location,
-             draggable:true,
-             icon:  new google.maps.MarkerImage("images/green.png")
-         });
+        trip.startMarker = new google.maps.Marker({
+          map: map, 
+          position: results[0].geometry.location,
+          draggable:true,
+          icon:  new google.maps.MarkerImage("images/green.png")
+        });
 
-         google.maps.event.addListener(start_marker, 'click', function() {
-           if(lastWindow) lastWindow.close(); //close the last window if it exists
-           if(infoWindow) infoWindow.close();
-           lastWindow = new google.maps.InfoWindow( {
-             pixelOffset: new google.maps.Size(0,-32),
-             position: results[0].geometry.location,
-             content: '<strong>Start and End Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
-           });
-           lastWindow.open(map);
-         });
+        google.maps.event.addListener(trip.startMarker, 'click', function(position) {
+          if(lastWindow) lastWindow.close(); //close the last window if it exists
+          infoWindow.setOptions({
+            content: '<strong>Walking tour start and end Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
+          });
+          infoWindow.open(map, trip.startMarker);
+        });
 
-         google.maps.event.addListener(start_marker, 'dragend', function(position) {
-           //Show loading screen
-           $.mobile.pageLoading();
-           displayRoute(position.latLng);
-         });
+        google.maps.event.addListener(trip.startMarker, 'dragend', function(position) {
+          //Show loading screen
+          $.mobile.pageLoading();
+          trip.start = position.latLng;
+          displayRoute();
+        });
          
-        displayRoute(results[0].geometry.location);
+        trip.start = results[0].geometry.location;
+        displayRoute();
       });
 
     } else {
-      alert(start + " not found");
+      alert(trip.start + " not found");
       return false;
     }
   });
@@ -329,15 +328,6 @@ function launchMap(){
     }
   ];
   
-  directionsOptions = {
-    map: null,
-    draggable: true,
-    suppressMarkers: true,
-    markerOptions: {
-    zIndex: 100
-    }
-  };
-  
   map = new google.maps.Map(document.getElementById("map_canvas"), {
     zoom: 12,
     center: new google.maps.LatLng(37.777, -122.419),
@@ -348,10 +338,18 @@ function launchMap(){
   
   infoWindow = new google.maps.InfoWindow();
   
+  directionsService = new google.maps.DirectionsService();
   
-  directionsDisplay = new google.maps.DirectionsRenderer(directionsOptions);
+  directionsDisplay = new google.maps.DirectionsRenderer({
+    map: null,
+    draggable: false,
+    suppressMarkers: true,
+    markerOptions: {
+    zIndex: 100
+    }
+  });
   
-  var  styledMapOptions = {
+  var styledMapOptions = {
     name: "walking"
   }
   
@@ -359,28 +357,16 @@ function launchMap(){
   
   map.mapTypes.set('walking', walkingMapType);
   map.setMapTypeId('walking');
-  
-}
-
-function makeMarker(options){
-   var pushPin = new google.maps.Marker({map:map,icon:new google.maps.MarkerImage("images/icon.png",null,null,new google.maps.Point(16,16))});
-   pushPin.setOptions(options);
-   google.maps.event.addListener(pushPin, 'click', function(){
-     if(lastWindow) lastWindow.close(); //close the last window if it exists
-     infoWindow.setOptions(options);
-     infoWindow.open(map, pushPin);
-   });
-   markerArray.push(pushPin);
-   return pushPin;
 }
 
 function clearMap(){
   //Reset Points
-  for(i in markerArray){
-    markerArray[i].setMap(null);
+  for(i in trip.markerArray){
+    trip.markerArray[i].setMap(null);
   }
-  markerArray = [];
-  points = [];
+  
+  trip.markerArray = [];
+  trip.waypoints = [];
   directionsDisplay.setMap(null);
   
   //close the last infowindow if it exists
@@ -393,7 +379,7 @@ function generateLinks(){
   $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
 }
 
-function displayRoute(start){  
+function displayRoute(){
   clearMap();
   
   generateLinks();
@@ -404,100 +390,58 @@ function displayRoute(start){
   //Google Fusion Table ID
   var tableid = 611081;
   
-  new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) OFFSET " + random + " LIMIT 8")).send(function(response){
+  new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+trip.start.lat()+","+trip.start.lng()+")) OFFSET " + random + " LIMIT 8")).send(function(response){
     
     numRows = response.getDataTable().getNumberOfRows();
     numCols = response.getDataTable().getNumberOfColumns();
     
-    var limit = numRows;
+    limit = numRows;
 
-    //create an array of row values
+    //create an array of row values and an array of addresses
     for (var i = 0; i < numRows; i++) {
-      var row = [];
-      for (var j = 0; j < numCols; j++) {
-        row.push(response.getDataTable().getValue(i, j));
-      }
-      (function(row, i){
-        geocoder.geocode( { 'address': row[1] }, function(results, status) {
-          if (status == google.maps.GeocoderStatus.OK) {
-            var coordinate = results[0].geometry.location;
-            
-            //Yelp lookup
-            var options = {
-              term: row[0],
-              lat: coordinate.lat(),
-              long: coordinate.lng(),
-              radius: 1,
-              limit: 1,
-              ywsid: '00zW70MC_sCMJIpsokD0hQ'
-            }
-            $.getJSON('http://api.yelp.com/business_review_search?&callback=?', options, function(data){
-              //Check if any results then create the marker
-              if(data.businesses.length>0){
-                //Yelp had results, take the first one
-                yelp = data.businesses[0];
-              
-                makeMarker({
-                  position:coordinate,
-                  pixelOffset: new google.maps.Size(0,16),
-                  content: '<div id="marker' + i + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2]  + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a><br><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp"></a></div>'
-                });
-              } else {
-                //Couldn't find on yelp
-                makeMarker({
-                  position:coordinate,
-                  pixelOffset: new google.maps.Size(0,16),
-                  content: '<div id="marker' + i + '" class="marker"><strong>' + row[0] + '</strong><br>' + row[1] + '<br>Tags: ' + row[2]  + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng('+coordinate.lat()+','+coordinate.lng()+'))">StreetView</a></div>'
-                });
-              }
-
-              //Add to points array
-              points.push({coordinate:coordinate,data:row});
-              
-              limit -= 1;
-              //Check if loop is done, them move on
-              if(limit==0) { getDirections(points, start); }
-            });
-          }
-        });
-      })(row, i);
+      var row = {
+        name: response.getDataTable().getValue(i, 0),
+        address: response.getDataTable().getValue(i, 1),
+        tags: response.getDataTable().getValue(i, 2)
+      };
+      trip.waypoints.push(row);
     }
+    getDirections();
   });
 }
 
-function getDirections(points, start){
-  var DirectionsService = new google.maps.DirectionsService();
-
-  //Create waypoints
-  var waypoints = new Array();
-  $.each(points, function(index, value){
-    waypoints.push({
-      location: value.coordinate
-    });
-  });
+function getDirections(){
+  var addresses = [];
+  for(var i in trip.waypoints){
+    addresses.push({location: trip.waypoints[i].address});
+  }
 
   var request = {
-   origin: start,
-   destination: start,
-   waypoints: waypoints,
+   origin: trip.start,
+   destination: trip.start,
+   waypoints: addresses,
    optimizeWaypoints: true,
    travelMode: google.maps.DirectionsTravelMode.WALKING
   };
-  DirectionsService.route(request, function(response, status) {
-   if (status == google.maps.DirectionsStatus.OK) {
+  directionsService.route(request, function(response, status) {
+   if(status == google.maps.DirectionsStatus.OK) {
+     
      directionsDisplay.setDirections(response);
      directionsDisplay.setMap(map);
-     
      
      //Do directions
      $('#directions .content').html('');
      $.each(response.routes[0].legs, function(index, leg){
        if(index<response.routes[0].legs.length-1){
-         var waypointID = response.routes[0].optimized_waypoint_order[index-1];
+         var waypointID = response.routes[0].optimized_waypoint_order[index];
+          
+         //Assign coordinate from directions to waypoint
+         trip.waypoints[waypointID].coordinate = leg.end_location;
+         
          if(index==0){
            $('#directions .content').append('<h2>Start at '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2>');
          } else {
-           $('#directions .content').append('<h2>' + index + '. ' + points[waypointID].data[0] + '</h2>');
+           $('#directions .content').append('<h2>' + index + '. ' + trip.waypoints[waypointID].name + '</h2>');
          }
          $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
          $('#directions .content').append('<ul class="directions' + index + '"></ul>');
@@ -507,10 +451,65 @@ function getDirections(points, start){
        }
      });
      
+     //Create Points
+     for (var i in trip.waypoints){
+       createPoint(trip.waypoints[i], i);
+     }
+     
      getElevation(response);
+   } else {
+     console.log(response);
    }
   });
 }
+
+function createPoint(waypoint, i){
+  //Yelp lookup
+  var options = {
+    term: waypoint.name,
+    lat: waypoint.coordinate.lat(),
+    long: waypoint.coordinate.lng(),
+    radius: 1,
+    limit: 1,
+    ywsid: '00zW70MC_sCMJIpsokD0hQ'
+  }
+  $.getJSON('http://api.yelp.com/business_review_search?&callback=?', options, function(result){    
+    var infoWindowContent;
+    
+    //Check if any results then create the marker
+    if(result.businesses.length>0){
+      //Yelp had results, take the first one
+      yelp = result.businesses[0];
+    
+      infoWindowContent = '<div id="marker' + i + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a><br><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp"></a></div>';
+    } else {
+      //Couldn't find on yelp
+      infoWindowContent = '<div id="marker' + i + '" class="marker"><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
+    }
+    
+    var options = {
+      position: waypoint.coordinate,
+      content: infoWindowContent,
+      pixelOffset: new google.maps.Size(0,16)
+    }
+    makeMarker(options);
+  });
+}
+
+function makeMarker(options){
+  var marker = new google.maps.Marker({
+    map: map,
+    icon: new google.maps.MarkerImage("images/icon.png",null,null,new google.maps.Point(16,16))
+  });
+  marker.setOptions(options);
+  google.maps.event.addListener(marker, 'click', function(){
+    if(lastWindow) lastWindow.close(); //close the last window if it exists
+    infoWindow.setOptions(options);
+    infoWindow.open(map, marker);
+  });
+  trip.markerArray.push(marker);
+}
+
 
 function getElevation(response){
   var elevationService = new google.maps.ElevationService();
