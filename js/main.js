@@ -170,6 +170,7 @@ function resizeMobile(){
   $("#map").css('height',$(window).height());
   $("#pano").css('height',panoheight);
   $("#home").css('height',$(window).height());
+  $("#credits").css('height',$(window).height());
   google.maps.event.trigger(map,'resize');
 }
 

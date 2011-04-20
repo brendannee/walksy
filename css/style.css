@@ -8,7 +8,7 @@ body{
 
 #ui-page-start, #ui-page-start > .ui-content { height: 100% }
 
-#home .ui-header, #home .ui-content, #home .ui-footer{
+#home .ui-header, #home .ui-content, #home .ui-footer, #credits .ui-header, #credits .ui-content, #credits .ui-footer{
   max-width:600px;
   margin:0 auto;
   border-left-width: 1px;
