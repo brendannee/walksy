@@ -67,113 +67,6 @@ function showGeoLocatorError(error){
   } 
 }
 
-function submitForm() {
-  // Redraws map based on info in the form
-  $('#inputs input').blur();
-  $.mobile.pageLoading();	
-  
-  var start = $('#startbox').val();
-  tags = []; 
-  $('#tags :checked').each(function(){
-    tags.push($(this).attr('id'));
-  });
-  
-  //Validate inputs
-  if(start==''){
-    $('#startbox').addClass('error');
-    $('#startbox').focus();
-    $.mobile.pageLoading(true);	
-    return false;
-  } else {$('#startbox').removeClass('error');}
-  
-  //Make sure at least one tag is checked
-  /*if(tags.length < 1){
-    $('#tags label').addClass('error');
-    $('#tags .ui-controlgroup-controls').prepend('<div class="error">Check at least one category</div>');
-    $.mobile.pageLoading(true);
-    return false;
-  }*/
-
-  geocoder = new google.maps.Geocoder();
-  geocoder.geocode({address:start}, function(results, status){
-    if(status == google.maps.GeocoderStatus.OK) {
-      
-      $.mobile.changePage($('#map'),"slide");
-      
-      //Show loading
-      $.mobile.pageLoading();
-      
-      //Wait for pageload
-      $('#map').live('pageshow',function(event, ui){
-        //Recenter map on SF
-        map.setCenter(new google.maps.LatLng(37.777, -122.419));
-        
-        //create start/end marker
-        trip.startMarker = new google.maps.Marker({
-          map: map, 
-          position: results[0].geometry.location,
-          draggable:true,
-          icon:  new google.maps.MarkerImage("images/green.png")
-        });
-
-        google.maps.event.addListener(trip.startMarker, 'click', function(position) {
-          if(lastWindow) lastWindow.close(); //close the last window if it exists
-          infoWindow.setOptions({
-            content: '<strong>Walking tour start and end Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
-          });
-          infoWindow.open(map, trip.startMarker);
-        });
-
-        google.maps.event.addListener(trip.startMarker, 'dragend', function(position) {
-          //Show loading screen
-          $.mobile.pageLoading();
-          trip.start = position.latLng;
-          displayRoute();
-        });
-         
-        trip.start = results[0].geometry.location;
-        displayRoute();
-      });
-
-    } else {
-      alert(trip.start + " not found");
-      return false;
-    }
-  });
-return false;
-}
-
-function resizeMobile(){
-  //Check if window is landscape by looking and height and SVG support to decide if to show Profile
-  var mapheight;
-  if(isiPhone()){
-    //Hide top address bar
-    window.top.scrollTo(0, 1);
-    if(window.orientation==0){
-      //Show profile bar if portriat mode
-      mapheight = $(window).height()-40-parseInt($('#map .ui-header').css('height'));
-    } else {
-      mapheight = $(window).height()+60-parseInt($('#map .ui-header').css('height'));
-    }
-    panoheight = $(window).height()+60-parseInt($('#streetview .ui-header').css('height'));
-  } else {
-    //Not iphone
-    if($(window).height()>300 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
-      //Show profile if enough room ans SVG supported
-      mapheight = $(window).height()-100-parseInt($('#map .ui-header').css('height'));
-    } else {
-      mapheight = $(window).height()-parseInt($('#map .ui-header').css('height'));
-    }
-    panoheight = $(window).height()-parseInt($('#streetview .ui-header').css('height'));
-  }
-  $("#map_canvas").css('height',mapheight);
-  $("#map").css('height',$(window).height());
-  $("#pano").css('height',panoheight);
-  $("#home").css('height',$(window).height());
-  $("#credits").css('height',$(window).height());
-  google.maps.event.trigger(map,'resize');
-}
-
 function launchMap(){
   
   var styles = [
@@ -349,6 +242,29 @@ function launchMap(){
     }
   });
   
+  //create start marker
+  trip.startMarker = new google.maps.Marker({
+    map: map,
+    draggable:true,
+    icon:  new google.maps.MarkerImage("images/green.png")
+  });
+  
+  //Evenys for start marker
+  google.maps.event.addListener(trip.startMarker, 'click', function(position) {
+    if(lastWindow) lastWindow.close(); //close the last window if it exists
+    infoWindow.setOptions({
+      content: '<strong>Walking tour start and end Location</strong><br>'+results[0].formatted_address.replace(/, USA/g, "")
+    });
+    infoWindow.open(map, trip.startMarker);
+  });
+
+  google.maps.event.addListener(trip.startMarker, 'dragend', function(position) {
+    //Show loading screen
+    $.mobile.pageLoading();
+    trip.start = position.latLng;
+    displayRoute();
+  });
+  
   var styledMapOptions = {
     name: "walking"
   }
@@ -357,6 +273,93 @@ function launchMap(){
   
   map.mapTypes.set('walking', walkingMapType);
   map.setMapTypeId('walking');
+}
+
+
+function submitForm() {
+  // Redraws map based on info in the form
+  $('#inputs input').blur();
+  $.mobile.pageLoading();	
+  
+  var start = $('#startbox').val();
+  tags = []; 
+  $('#tags :checked').each(function(){
+    tags.push($(this).attr('id'));
+  });
+  
+  //Validate inputs
+  if(start==''){
+    $('#startbox').addClass('error');
+    $('#startbox').focus();
+    $.mobile.pageLoading(true);	
+    return false;
+  } else {$('#startbox').removeClass('error');}
+  
+  //Make sure at least one tag is checked
+  /*if(tags.length < 1){
+    $('#tags label').addClass('error');
+    $('#tags .ui-controlgroup-controls').prepend('<div class="error">Check at least one category</div>');
+    $.mobile.pageLoading(true);
+    return false;
+  }*/
+
+  geocoder.geocode({address:start}, function(results, status){
+    if(status == google.maps.GeocoderStatus.OK) {
+      
+      $.mobile.changePage($('#map'),"slide");
+      
+      //Show loading
+      $.mobile.pageLoading();
+      
+      //Wait for pageload
+      $('#map').live('pageshow',function(event, ui){
+        //Recenter map on SF
+        map.setCenter(new google.maps.LatLng(37.777, -122.419));
+        
+        //Assign position to start marker
+        trip.startMarker.setPosition(results[0].geometry.location);
+         
+        trip.start = results[0].geometry.location;
+        displayRoute();
+      });
+
+    } else {
+      alert(trip.start + " not found");
+      return false;
+    }
+  });
+return false;
+}
+
+function resizeMobile(){
+  //Check if window is landscape by looking and height and SVG support to decide if to show Profile
+  var mapheight;
+  if(isiPhone()){
+    //Hide top address bar
+    window.top.scrollTo(0, 1);
+    if(window.orientation==0){
+      //Show profile bar if portriat mode
+      mapheight = $(window).height()-40-parseInt($('#map .ui-header').css('height'));
+    } else {
+      mapheight = $(window).height()+60-parseInt($('#map .ui-header').css('height'));
+    }
+    panoheight = $(window).height()+60-parseInt($('#streetview .ui-header').css('height'));
+  } else {
+    //Not iphone
+    if($(window).height()>300 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
+      //Show profile if enough room ans SVG supported
+      mapheight = $(window).height()-100-parseInt($('#map .ui-header').css('height'));
+    } else {
+      mapheight = $(window).height()-parseInt($('#map .ui-header').css('height'));
+    }
+    panoheight = $(window).height()-parseInt($('#streetview .ui-header').css('height'));
+  }
+  $("#map_canvas").css('height',mapheight);
+  $("#map").css('height',$(window).height());
+  $("#pano").css('height',panoheight);
+  $("#home").css('height',$(window).height());
+  $("#credits").css('height',$(window).height());
+  google.maps.event.trigger(map,'resize');
 }
 
 function clearMap(){
