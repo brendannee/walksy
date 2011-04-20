@@ -431,25 +431,36 @@ function getDirections(){
      
      //Do directions
      $('#directions .content').html('');
+     var totalDistance = 0;
+     var totalDuration = 0;
      $.each(response.routes[0].legs, function(index, leg){
        if(index<response.routes[0].legs.length-1){
          var waypointID = response.routes[0].optimized_waypoint_order[index];
+         
+         totalDistance += leg.distance.value;
+         totalDuration += leg.duration.value;
           
          //Assign coordinate from directions to waypoint
          trip.waypoints[waypointID].coordinate = leg.end_location;
          
          if(index==0){
-           $('#directions .content').append('<h2>Start at '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2>');
+           $('#directions .content').append('<h2>Walking Tour starting from '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2><div class="summary"></div>');
          } else {
            $('#directions .content').append('<h2>' + index + '. ' + trip.waypoints[waypointID].name + '</h2>');
+           $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
          }
-         $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
+         
+        $('#directions .content').append('<div class="distance">Walk ' + leg.distance.text + '</div>');
          $('#directions .content').append('<ul class="directions' + index + '"></ul>');
          $.each(leg.steps, function(i, step){
            $('#directions .content .directions'+index).append('<li>'+step.instructions+'</li>');
          })
        }
      });
+     
+     //Add summary info
+     
+     $('#directions .summary').html(Math.round(totalDistance/1609.344*10)/10 + " miles, " + Math.floor(totalDuration/60) + " minutes, " + response.routes[0].legs.length + " stops");
      
      //Create Points
      for (var i in trip.waypoints){

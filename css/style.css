@@ -113,7 +113,17 @@ label{
   padding-right:15px;
 }
 
+#directions .distance{
+  margin-top:10px;
+  margin-left:25px;
+  font-weight:bold;
+}
+
+#directions ul{
+  margin-top:0;
+}
+
 #directions .streetview{
-  font-size:11px;
-  color:#CCCCFF;
+  font-size:12px;
+  color:#EECCFF;
 }
