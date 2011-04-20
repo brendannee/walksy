@@ -374,9 +374,6 @@ function makeMarker(options){
  }
 
 function displayRoute(start){  
-  //Google Fusion Table ID
-  var tableid = 611081;
-  
   //Reset Points
   for(i in markerArray){
     markerArray[i].setMap(null);
@@ -393,6 +390,9 @@ function displayRoute(start){
   
   //Generate random number for query offset to randomize trips
   var random = Math.floor(Math.random()*4);
+  
+  //Google Fusion Table ID
+  var tableid = 611081;
   
   var query = new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+start.lat()+","+start.lng()+")) OFFSET " + random + " LIMIT 8"));
   query.send(function(response){
@@ -447,14 +447,7 @@ function displayRoute(start){
               
               limit -= 1;
               //Check if loop is done, them move on
-              if(limit==0) {
-                var trip = {
-                  points: points,
-                  start: start
-                };
-
-                getDirections(trip);
-              }
+              if(limit==0) { getDirections(points, start); }
             });
           }
         });
@@ -463,20 +456,20 @@ function displayRoute(start){
   });
 }
 
-function getDirections(trip){
+function getDirections(points, start){
   var DirectionsService = new google.maps.DirectionsService();
 
   //Create waypoints
   var waypoints = new Array();
-  $.each(trip.points, function(index, value){
+  $.each(points, function(index, value){
     waypoints.push({
       location: value.coordinate
     });
   });
 
   var request = {
-   origin: trip.start,
-   destination: trip.start,
+   origin: start,
+   destination: start,
    waypoints: waypoints,
    optimizeWaypoints: true,
    travelMode: google.maps.DirectionsTravelMode.WALKING
@@ -495,20 +488,17 @@ function getDirections(trip){
          if(index==0){
            $('#directions .content').append('<h2>Start at '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2>');
          } else {
-           $('#directions .content').append('<h2>' + index + '. ' + trip.points[waypointID].data[0] + '</h2>');
+           $('#directions .content').append('<h2>' + index + '. ' + points[waypointID].data[0] + '</h2>');
          }
          $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
          $('#directions .content').append('<ul class="directions' + index + '"></ul>');
          $.each(leg.steps, function(i, step){
            $('#directions .content .directions'+index).append('<li>'+step.instructions+'</li>');
          })
-       } else {
-         
        }
      });
      
      getElevation(response);
-     
    }
   });
 }
