@@ -366,17 +366,13 @@ function submitForm() {
       //Show loading
       $.mobile.pageLoading();
       
-      //Wait for pageload
-      $('#map').live('pageshow',function(event, ui){
-        //Recenter map on SF
-        map.setCenter(new google.maps.LatLng(37.777, -122.419));
-        
-        //Assign position to start marker
-        trip.startMarker.setPosition(results[0].geometry.location);
-         
-        trip.start = results[0].geometry.location;
-        displayRoute();
-      });
+      map.setCenter(results[0].geometry.location);
+      
+      //Assign position to start marker
+      trip.startMarker.setPosition(results[0].geometry.location);
+      
+      trip.start = results[0].geometry.location;
+      displayRoute();
 
     } else {
       alert(trip.start + " not found");
