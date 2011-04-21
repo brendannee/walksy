@@ -58,6 +58,7 @@ body{
   border-radius: 2px 2px;
   font-weight: normal; 
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(254, 254, 254)), to(rgb(243, 243, 243))); 
+  background-image: -moz-linear-gradient(center bottom, rgb(254,254,254) 0%,rgb(243,243,243) 100%);
   background-attachment: initial; 
   background-origin: initial; 
   background-clip: initial; 
