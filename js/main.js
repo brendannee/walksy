@@ -616,7 +616,7 @@ function getDirections(){
      trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
      trip.duration = Math.floor(totalDuration/60) + " minutes";
      $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-2) + " stops");
-     $('#map h1').html('Walking Tour (' + trip.distance + ')');
+     $('#map h1').html(trip.distance + ' Tour');
      
      //Create Points
      for (var i in trip.waypoints){
