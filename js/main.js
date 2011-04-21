@@ -410,7 +410,9 @@ function resizeMobile(){
   $("#pano").css('height',panoheight);
   $("#home").css('height',$(window).height());
   $("#credits").css('height',$(window).height());
-  google.maps.event.trigger(map,'resize');
+  if(map){
+    google.maps.event.trigger(map,'resize');
+  }
 }
 
 function displayRoute(){
