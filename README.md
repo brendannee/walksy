@@ -3,7 +3,7 @@ Walksy
 
 Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by [Brendan Nee](http://bn.ee).  The source code is available on [github](https://github.com/brendannee/walksy).
 
-Walksy makes walking tours of interesting things in San Francisco based on a specified start point.  It could be extended to work anywhere.
+Walksy.com makes walking tours of interesting things based on a specified start point.For walking tours staring in San Francisco, the points of interest come from a google Fusion table with hand-picked points of interest in San Francisco, CA by [Brendan Nee](http://bn.ee).  For all other starting locations, points of interest are pulled from SimpleGeo's Places API
 
 ## Demo ##
 
@@ -14,7 +14,9 @@ A live Demo is available at [http://walksy.com](http://walksy.com)
 * Elevation Profiles (requires SVG support, not available on Android)
 * Smart Mobile layout using [Jquery Mobile](http://jquerymobile.com/)
 * Custom Styled Map
-* Powered by Google [Fusion Tables](https://code.google.com/apis/fusiontables/)
+* Powered by Google [Fusion Tables](http://code.google.com/apis/fusiontables/)
+* Points of Interest pulled from [Simple Geo's Places API](http://simplegeo.com/products/places/)
+* Ratings for points of interest from [Yelp.com](http://yelp.com)
 * Smart optimized routing between all points of interest
 * Google Streetview for points of interest
 
@@ -26,7 +28,7 @@ Brendan Nee  me@bn.ee
 
 (The MIT License)
 
-Copyright (c) 2010 BlinkTag Inc &lt;info@blinktag.com&gt;
+Copyright (c) 2010 Brendan Nee &lt;me@bn.ee&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
