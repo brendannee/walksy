@@ -584,30 +584,34 @@ function getDirections(){
      directionsDisplay.setMap(map);
      
      //Do directions
-     $('#directions .content').html('');
+     $('#directions .content').html('<h2>Walking Tour starting from '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2><div class="summary"></div>');
      var totalDistance = 0;
      var totalDuration = 0;
+     
      $.each(response.routes[0].legs, function(index, leg){
        if(index<response.routes[0].legs.length-1){
          var waypointID = response.routes[0].optimized_waypoint_order[index];
          
+         //Add index value to waypoint
+         trip.waypoints[waypointID].index = index;
+         
+         //Sum the distace and duration
          totalDistance += leg.distance.value;
          totalDuration += leg.duration.value;
           
          //Assign coordinate from directions to waypoint
          trip.waypoints[waypointID].coordinate = leg.end_location;
-         
-         if(index==0){
-           $('#directions .content').append('<h2>Walking Tour starting from '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2><div class="summary"></div>');
-         } else {
-           $('#directions .content').append('<h2>' + index + '. ' + trip.waypoints[waypointID].name + '</h2>');
-           $('#directions .content').append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
-         }
-         
-        $('#directions .content').append('<div class="distance">Walk ' + leg.distance.text + '</div>');
-         $('#directions .content').append('<ul class="directions' + index + '"></ul>');
+         $('#directions .content').append('<div id="stop' + index + '"></div>');
+         $('#stop'+index).append('<div class="title">');
+         $('#stop'+index).append('<h2>' + (index+1) + '. ' + trip.waypoints[waypointID].name + '</h2>');
+         $('#stop'+index).append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
+         $('#stop'+index).append('<div class="rating"></div>');
+         $('#stop'+index).append('</div>');
+         $('#stop'+index).append('<div class="image"></div>');
+         $('#stop'+index).append('<div class="distance">Walk ' + leg.distance.text + '</div>');
+         $('#stop'+index).append('<ul class="directions"></ul>');
          $.each(leg.steps, function(i, step){
-           $('#directions .content .directions'+index).append('<li>'+step.instructions+'</li>');
+           $('#stop'+index+' .directions').append('<li>'+step.instructions+'</li>');
          })
        }
      });
@@ -615,12 +619,13 @@ function getDirections(){
      //Add summary info
      trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
      trip.duration = Math.floor(totalDuration/60) + " minutes";
-     $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-2) + " stops");
+     $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-1) + " stops");
      $('#map h1').html(trip.distance + ' Tour');
+     $('#directions .content').append('<a href="http://yelp.com" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp"></a>');
      
      //Create Points
      for (var i in trip.waypoints){
-       createPoint(trip.waypoints[i], i);
+       createPoint(trip.waypoints[i]);
      }
      
      getElevation(response);
@@ -630,7 +635,7 @@ function getDirections(){
   });
 }
 
-function createPoint(waypoint, i){
+function createPoint(waypoint){
   //Yelp lookup
   var options = {
     term: waypoint.name,
@@ -648,10 +653,13 @@ function createPoint(waypoint, i){
       //Yelp had results, take the first one
       yelp = result.businesses[0];
     
-      infoWindowContent = '<div id="marker' + i + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a><br><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp"></a></div>';
+      infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a><br><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp"></a></div>';
+      
+      $('#stop'+waypoint.index+' .image').html('<a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a>');
+      $('#stop'+waypoint.index+' .rating').html('<a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a>');
     } else {
       //Couldn't find on yelp
-      infoWindowContent = '<div id="marker' + i + '" class="marker"><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
+      infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
     }
     
     var options = {

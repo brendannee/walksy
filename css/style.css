@@ -108,10 +108,21 @@ label{
   width:100%;
 }
 
+#directions .title{
+  clear:both;
+}
+
 #directions h2{
   margin-bottom:0;
   display:inline;
   padding-right:15px;
+}
+
+#directions .image{
+  width:100px;
+  padding-right:5px;
+  float:left;
+  clear:both;
 }
 
 #directions .distance{
@@ -122,9 +133,22 @@ label{
 
 #directions ul{
   margin-top:0;
+  margin-left:90px;
 }
 
 #directions .streetview{
   font-size:12px;
-  color:#EECCFF;
+  color:#666;
+  padding:2px 3px;
+  border-radius:2px;
+  background-color:white;
+  text-shadow:none;
+}
+
+#directions .rating{
+  display:inline;
+  margin-left:15px;
+  padding:1px 3px;
+  border-radius:2px;
+  background-color:white;
 }
