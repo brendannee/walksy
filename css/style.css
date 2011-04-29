@@ -75,6 +75,15 @@ body{
   text-shadow:none;
 }
 
+.marker{
+  width:320px;
+}
+
+.marker a{
+  color:#333;
+  text-decoration:none;
+}
+
 .marker .thumb{
   float:left;
   width:100px;
@@ -146,9 +155,13 @@ label{
 }
 
 #directions .rating{
-  display:inline;
+  display:inline-block;
   margin-left:15px;
+  margin-bottom:5px;
   padding:1px 3px;
   border-radius:2px;
   background-color:white;
+  font-size: 12px;
+  color: #666;
+  text-shadow: none;
 }
