@@ -468,8 +468,12 @@ function sfPoints(){
         tags: response.getDataTable().getValue(i, 2).split(',')
       };
       trip.waypoints.push(row);
+      
+      //When complete, proceed
+      if(i == (numRows-1)) {
+        getDirections();
+      }
     }
-    getDirections();
   });
 }
 
