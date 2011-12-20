@@ -88,9 +88,8 @@ function detectRouteFromURL(){
     submitForm();
   } else {
     //Show Homepage
-    if($.mobile.activePage.attr('id')!='home'){
-      $.mobile.changePage($('#home'),"slide");
-    }
+    $.mobile.changePage($('#home'),"slide");
+
     if(navigator.geolocation) {  
       navigator.geolocation.getCurrentPosition(getGeoLocator,showGeoLocatorError);
     }
@@ -315,7 +314,7 @@ function launchMap(){
 
   google.maps.event.addListener(trip.startMarker, 'dragend', function(position) {
     //Show loading screen
-    $.mobile.pageLoading();
+    $.mobile.showPageLoadingMsg();
     trip.start = position.latLng;
     displayRoute();
   });
@@ -334,7 +333,7 @@ function launchMap(){
 function submitForm() {
   // Redraws map based on info in the form
   $('#inputs input').blur();
-  $.mobile.pageLoading();	
+  $.mobile.showPageLoadingMsg();	
   
   var start = $('#startbox').val();
   tags = []; 
@@ -346,17 +345,9 @@ function submitForm() {
   if(start==''){
     $('#startbox').addClass('error');
     $('#startbox').focus();
-    $.mobile.pageLoading(true);	
+    $.mobile.hidePageLoadingMsg();	
     return false;
   } else {$('#startbox').removeClass('error');}
-  
-  //Make sure at least one tag is checked
-  /*if(tags.length < 1){
-    $('#tags label').addClass('error');
-    $('#tags .ui-controlgroup-controls').prepend('<div class="error">Check at least one category</div>');
-    $.mobile.pageLoading(true);
-    return false;
-  }*/
 
   geocoder.geocode({address:start}, function(results, status){
     if(status == google.maps.GeocoderStatus.OK) {
@@ -364,7 +355,7 @@ function submitForm() {
       $.mobile.changePage($('#map'),"slide");
       
       //Show loading
-      $.mobile.pageLoading();
+      $.mobile.showPageLoadingMsg();
       
       map.setCenter(results[0].geometry.location);
       
@@ -564,7 +555,7 @@ function otherPoints(){
 function getDirections(){
   if(trip.waypoints.length == 0){
     //Remove loading screen
-    $.mobile.pageLoading( true );
+    $.mobile.hidePageLoadingMsg();
     alert('No points of interest found');
     return false;
   }
@@ -733,7 +724,7 @@ function getElevation(response){
       });
       
       //Remove loading screen
-      $.mobile.pageLoading( true );
+      $.mobile.hidePageLoadingMsg();
       
     }
   });
@@ -741,7 +732,7 @@ function getElevation(response){
 
 function streetView(position) {
   //Wait for pageload
-  $('#streetview').live('pageshow',function(event, ui){
+  $('#streetview').on('pageshow',function(event, ui){
     var panoramaOptions = {
       position:position,
       pov: {
