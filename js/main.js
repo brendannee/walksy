@@ -354,7 +354,7 @@ function displayRoute(){
   if(trip.start.lat() < 37.81 && trip.start.lat() > 37.71 && trip.start.lng() < -122.364 && trip.start.lng() > -122.517){
     sfPoints();
   } else {
-    otherPoints();
+    otherPoints(); 
   }
 }
 
@@ -560,7 +560,7 @@ function getDirections(){
      trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
      trip.duration = Math.floor(totalDuration/60) + " minutes";
      $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-1) + " stops");
-     $('#map h1').html(trip.distance + ', ' + trip.waypoints.length + ' stops');
+     $('#map h1').html(trip.distance + '<span>, ' + trip.waypoints.length + ' stops</span>');
      
      //Create Points
      for (var i in trip.waypoints){

@@ -179,10 +179,10 @@ label{
 #directions .streetview{
   font-size:12px;
   padding:7px 8px;
+  margin-right:20px;
 }
 
 #directions .rating{
-  margin-left:20px;
   padding:5px 8px;
   font-size: 12px;
   margin-top:5px;
@@ -255,5 +255,11 @@ label{
   .ui-header #headerInput{
     display:inline-block !important;
     width:40%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .ui-header h1 span{
+    display:none
   }
 }
