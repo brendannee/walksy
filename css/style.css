@@ -9,7 +9,6 @@ body{
 #ui-page-start, #ui-page-start > .ui-content { height: 100% }
 
 #home .ui-header, #home .ui-content, #home .ui-footer, #credits .ui-header, #credits .ui-content, #credits .ui-footer{
-  max-width:600px;
   margin:0 auto;
   border-left-width: 1px;
   border-right-width: 1px;
@@ -21,6 +20,10 @@ body{
 
 .logo{
   padding:0 10px;
+}
+
+.tagline{
+  padding-bottom:5px
 }
 
 #map{
@@ -96,7 +99,7 @@ body{
   margin-bottom:4px;
 }
 
-#startbox{
+#startBox{
   clear:both;
 }
 
@@ -121,8 +124,10 @@ label{
   width:100%;
 }
 
-#directions .title{
+#directions .waypoint{
   clear:both;
+  margin-top:7px;
+  overflow:hidden;
 }
 
 #directions h2{
@@ -149,23 +154,106 @@ label{
   margin-left:90px;
 }
 
-#directions .streetview{
-  font-size:12px;
-  color:#666;
-  padding:2px 3px;
-  border-radius:2px;
+#directions .btn{
+  display:inline-block;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
   background-color:white;
   text-shadow:none;
+  text-decoration:none;
+  -moz-box-shadow:    3px 3px 5px #333;
+  -webkit-box-shadow: 3px 3px 5px #333;
+  box-shadow:         3px 3px 5px #333;
+  border:2px #666 solid;
+  color: #333;
+  font-weight:bold;
+}
+
+#directions .actions{
+  margin-bottom:10px;
+  overflow:hidden;
+  padding-bottom:5px;
+}
+
+#directions .streetview{
+  font-size:12px;
+  padding:7px 8px;
 }
 
 #directions .rating{
-  display:inline-block;
-  margin-left:15px;
-  margin-bottom:5px;
-  padding:1px 3px;
-  border-radius:2px;
-  background-color:white;
+  margin-left:20px;
+  padding:5px 8px;
   font-size: 12px;
-  color: #666;
-  text-shadow: none;
+  margin-top:5px;
+}
+
+.summary{
+  margin:5px 0;
+}
+
+.additionalInfo,
+#headerUpdate{
+  display:none;
+}
+
+@media screen and (min-width: 800px) {
+  #inputs{
+    max-width:600px;
+    margin:auto;
+  }
+  .logo{
+    margin:0 15px 5px 15px;
+  }
+  .additionalInfo{
+    display:block;
+    margin:0 auto 15px auto;
+    overflow:hidden;
+  }
+  
+  .additionalInfo h2{
+    font-size:30px;
+  }
+  
+  .additionalInfo p{
+    line-height:24px;
+    width:500px;
+  }
+  
+  .additionalInfo .screenshot{
+    width:199px;
+    height:250px;
+    float:left;
+    margin:0 20px 10px 0;
+    border:3px solid #666;
+    -moz-box-shadow:    3px 3px 5px #aaa;
+    -webkit-box-shadow: 3px 3px 5px #aaa;
+    box-shadow:         3px 3px 5px #aaa;
+  }
+  
+  .ui-footer .ui-btn{
+    margin:5px 15px 5px 15px !important;
+  }
+  
+  .ui-footer{
+    position:absolute !important;
+    bottom:0;
+  }
+  
+  .ui-header .edit{
+    display:none !important;
+  }
+  
+  .ui-header h1{
+    display:inline-block !important;
+  }
+  
+  .ui-header #headerUpdate{
+    display:inline !important;
+  }
+  
+  .ui-header #headerInput{
+    display:inline-block !important;
+    width:40%;
+  }
 }

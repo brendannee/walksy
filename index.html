@@ -3,9 +3,14 @@
 <head>
   <meta charset="utf-8">
   <title>Walksy.com - Walking tours on the Fly</title>
-  <link rel="stylesheet" type="text/css" href="css/style.css" media="screen" />
   <link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:regular,bold&amp;subset=latin' rel='stylesheet' type='text/css'>
   <meta name="description" content="Walksy.com leads you on great walking trips around your city" />
+  
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="cleartype" content="on">
+  
   <link rel="stylesheet" href="css/style.css" media="screen" />
   <link rel="stylesheet" href="css/jquery.mobile-1.0.min.css" media="screen" />
 </head>
@@ -14,13 +19,18 @@
   
   <div data-role="page" data-theme="b" id="home"> 
     <div data-role="header" data-backbtn="false">
-      <div class="logo"><img src="images/walksy.png" alt="Walksy.com"> <div style="clear:both">Walking Tours on the Fly</div></div>
+      <div class="logo"><img src="images/walksy.png" alt="Walksy.com"> <div class="tagline">Walking Tours on the Fly</div></div>
     </div> 
 
     <div data-role="content"> 
       <form id="inputs" method="post" action="">
-        <label for="startbox">Where should your walking tour start?</label>
-        <input id="startbox" name="startbox" type="text" class="textbox" placeholder="Moscone Center, SF"  title="Enter your starting address, intersection or landmark" tabindex="1"><br>
+        <div class="additionalInfo">
+          <img src="images/walksy-screenshot.jpg" class="screenshot">
+          <h2>Walk with Walksy</h2>
+          <p>Generate a walking tour of any neighborhood in the United States with up to 8 points of interest.  Walksy gives you directions, elevation and photos.</p>
+        </div>
+        <label for="startBox">Where should your walking tour start?</label>
+        <input id="startBox" name="startBox" type="text" class="textbox" placeholder="Moscone Center, SF"  title="Enter your starting address, intersection or landmark" tabindex="1"><br>
         <!--<div data-role="fieldcontain">
           <label for="slider">How far would you like to walk:</label>
           <input type="range" name="slider" id="slider" value="5" min="1" max="40"  />
@@ -59,7 +69,11 @@
   
   <div data-role="page" data-theme="a" id="map">
     <div data-role="header">
-      <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
+      <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse" class="edit">Edit</a>
+      <form id="headerUpdate">
+        <input type="text" id="headerInput"></input>
+        <button type="submit">Update</button>
+      </form>
       <h1>Map</h1>
       <a href="#directions" data-role="button" data-icon="arrow-d" data-iconpos="right" data-transition="slidedown">Directions</a>
     </div>
@@ -92,6 +106,7 @@
   
   <div data-role="page" data-theme="b" id="credits">
     <div data-role="header">
+      <a href="#home" data-role="button" data-icon="arrow-l" data-direction="reverse">Back</a>
       <h1>Credits</h1>
     </div>
     <div data-role="content">
@@ -120,18 +135,23 @@
   
   <script src="js/jquery.mobile-1.0.min.js"></script>
   
-  <script src="js/main.js" charset="utf-8"></script>
+  <script src="js/helper.js"></script>
+  
+  <script src="js/main.js"></script>
+  
   <script>
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-306190-17']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-
+    // iPhone Scale Bug Fix, read this when using http://www.blog.highub.com/mobile-2/a-fix-for-iphone-viewport-scale-bug/
+    window.onload = function() {
+        MBP.scaleFix();
+        MBP.hideUrlBar();
+    }
+  </script>
+  
+  <script>
+    var _gaq=[["_setAccount","UA-306190-17"],["_trackPageview"]];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+    g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
+    s.parentNode.insertBefore(g,s)}(document,"script"));
   </script>
   
 </body>

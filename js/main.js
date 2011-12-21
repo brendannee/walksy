@@ -8,48 +8,6 @@ var tagList = ["traditional", "architecture", "history", "museum", "neighborhood
 var tags =[];
 var categories = ['Shopping Mall','UNESCO World Heritage Site', 'Tourist Attraction', 'Scenic View', 'Ruins', 'Plaza', 'Palace', 'Monument', 'Historic', 'Fountain', 'Fort', 'City Walls', 'Castle', 'Battlefield', 'Archeological Site', 'Lake', 'Canyon', 'Beach', 'Vineyard', 'Distillery', 'Brewery', 'Theme Park', 'Go Karts', 'Circus', 'Miniature Golf', 'Museum', 'Bull Ring'];
 
-(function(){
-  var small = "(a|an|and|as|at|but|by|en|for|if|in|of|on|or|the|to|v[.]?|via|vs[.]?)";
-  var punct = "([!\"#$%&'()*+,./:;<=>?@[\\\\\\]^_`{|}~-]*)";
-  
-  this.titleCaps = function(title){
-    var parts = [], split = /[:.;?!] |(?: |^)["Ò]/g, index = 0;
-    
-    while (true) {
-      var m = split.exec(title);
-
-      parts.push( title.substring(index, m ? m.index : title.length)
-        .replace(/\b([A-Za-z][a-z.'Õ]*)\b/g, function(all){
-          return /[A-Za-z]\.[A-Za-z]/.test(all) ? all : upper(all);
-        })
-        .replace(RegExp("\\b" + small + "\\b", "ig"), lower)
-        .replace(RegExp("^" + punct + small + "\\b", "ig"), function(all, punct, word){
-          return punct + upper(word);
-        })
-        .replace(RegExp("\\b" + small + punct + "$", "ig"), upper));
-      
-      index = split.lastIndex;
-      
-      if ( m ) parts.push( m[0] );
-      else break;
-    }
-    
-    return parts.join("").replace(/ V(s?)\. /ig, " v$1. ")
-      .replace(/(['Õ])S\b/ig, "$1s")
-      .replace(/\b(AT&T|Q&A)\b/ig, function(all){
-        return all.toUpperCase();
-      });
-  };
-    
-  function lower(word){
-    return word.toLowerCase();
-  }
-    
-  function upper(word){
-    return word.substr(0,1).toUpperCase() + word.substr(1);
-  }
-})();
-
 function shuffle(array) {
   var tmp, current, top = array.length;
 
@@ -84,8 +42,9 @@ $.extend({
 function detectRouteFromURL(){
   //Detect saved route from URL
   if($.getUrlVar('start')!=undefined){
-    $('#startbox').val(decodeURIComponent($.getUrlVar('start').replace(/\+/g,' ')));
-    submitForm();
+    var start = decodeURIComponent($.getUrlVar('start').replace(/\+/g,' '))
+    $('#startBox').val(start);
+    getWalkingTour(start);
   } else {
     //Show Homepage
     $.mobile.changePage($('#home'),"slide");
@@ -108,7 +67,7 @@ function getGeoLocator(position) {
   var geocoder = new google.maps.Geocoder();
   geocoder.geocode({'latLng': coords}, function(results, status) {
     if (status == google.maps.GeocoderStatus.OK) {
-      $('#startbox').val(results[0].formatted_address.replace(/, CA, USA/g, ""));
+      $('#startBox').val(results[0].formatted_address.replace(/, CA, USA/g, ""));
     }
   });
 }
@@ -330,47 +289,27 @@ function launchMap(){
 }
 
 
-function submitForm() {
-  // Redraws map based on info in the form
-  $('#inputs input').blur();
-  $.mobile.showPageLoadingMsg();	
-  
-  var start = $('#startbox').val();
-  tags = []; 
-  $('#tags :checked').each(function(){
-    tags.push($(this).attr('id'));
-  });
-  
-  //Validate inputs
-  if(start==''){
-    $('#startbox').addClass('error');
-    $('#startbox').focus();
-    $.mobile.hidePageLoadingMsg();	
-    return false;
-  } else {$('#startbox').removeClass('error');}
-
-  geocoder.geocode({address:start}, function(results, status){
+function getWalkingTour(start) {
+  geocoder.geocode({address:start}, function(data, status){
+    console.log(data);
     if(status == google.maps.GeocoderStatus.OK) {
+      //put start location in headerbox
+      $('#headerInput').val(data[0].formatted_address.replace(', USA',''))
       
       $.mobile.changePage($('#map'),"slide");
       
-      //Show loading
-      $.mobile.showPageLoadingMsg();
-      
-      map.setCenter(results[0].geometry.location);
+      map.panTo(data[0].geometry.location);
       
       //Assign position to start marker
-      trip.startMarker.setPosition(results[0].geometry.location);
+      trip.startMarker.setPosition(data[0].geometry.location);
       
-      trip.start = results[0].geometry.location;
+      trip.start = data[0].geometry.location;
       displayRoute();
 
     } else {
       alert(trip.start + " not found");
-      return false;
     }
   });
-return false;
 }
 
 function resizeMobile(){
@@ -434,9 +373,9 @@ function clearMap(){
 }
 
 function generateLinks(){
-  $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent($('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+  $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent($('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")));
 
-  $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startbox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+  $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")));
 }
 
 function sfPoints(){
@@ -596,18 +535,24 @@ function getDirections(){
           
          //Assign coordinate from directions to waypoint
          trip.waypoints[waypointID].coordinate = leg.end_location;
-         $('#directions .content').append('<div id="stop' + index + '"></div>');
-         $('#stop'+index).append('<div class="title">');
-         $('#stop'+index).append('<h2>' + (index+1) + '. ' + trip.waypoints[waypointID].name + '</h2>');
-         $('#stop'+index).append('<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview">StreetView</a>');
-         $('#stop'+index).append('<div class="rating"></div>');
-         $('#stop'+index).append('</div>');
-         $('#stop'+index).append('<div class="image"></div>');
-         $('#stop'+index).append('<div class="distance">Walk ' + leg.distance.text + '</div>');
-         $('#stop'+index).append('<ul class="directions"></ul>');
-         $.each(leg.steps, function(i, step){
-           $('#stop'+index+' .directions').append('<li>'+step.instructions+'</li>');
-         })
+         
+         var directionDiv = '<div id="stop' + index + '" class="waypoint">' +
+           '<h2>' + (index+1) + '. ' + trip.waypoints[waypointID].name + '</h2>' +
+           '<div class="actions">' +
+           '<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview btn" title="View on Google Streetview">StreetView</a>' +
+           '<a class="rating btn" title="View Reviews on Yelp.com"></a>' +
+           '</div>' +
+           '<div class="image"></div>' +
+           '<div class="distance">Walk ' + leg.distance.text + '</div>' +
+           '<ul class="directions">';
+           
+           $.each(leg.steps, function(i, step){
+             directionDiv += '<li>'+step.instructions+'</li>';
+           });
+           
+           directionDiv += '</ul></div>';
+         
+         $('#directions .content').append(directionDiv);
        }
      });
      
@@ -615,7 +560,7 @@ function getDirections(){
      trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
      trip.duration = Math.floor(totalDuration/60) + " minutes";
      $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-1) + " stops");
-     $('#map h1').html(trip.distance + ' Tour');
+     $('#map h1').html(trip.distance + ', ' + trip.waypoints.length + ' stops');
      
      //Create Points
      for (var i in trip.waypoints){
@@ -652,7 +597,9 @@ function createPoint(waypoint){
       infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a> <em>' + yelp.review_count + ' reviews on</em> <a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp" style="vertical-align:bottom;"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
       
       $('#stop'+waypoint.index+' .image').html('<a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a>');
-      $('#stop'+waypoint.index+' .rating').html('<a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a> <em>' + yelp.review_count + ' reviews on</em> <a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp" style="vertical-align:bottom;"></a>');
+      $('#stop'+waypoint.index+' .rating')
+        .html('<img src="' + yelp.rating_img_url_small + '" alt="Yelp Rating""> <em>' + yelp.review_count + ' reviews on</em> <img src="images/yelp_logo.png" alt="Yelp" style="vertical-align:bottom;">')
+        .attr('href', yelp.url);
     } else {
       //Couldn't find on yelp
       infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
@@ -766,8 +713,83 @@ google.setOnLoadCallback(function(){
 
   detectRouteFromURL();
   
-  $('#inputs').submit(submitForm)
+  $('#inputs').submit(function(){
+    //Show loading
+    $.mobile.showPageLoadingMsg();
+    $('#inputs input').blur();
+  
+    var start = $('#startBox').val();
+    tags = []; 
+    $('#tags :checked').each(function(){
+      tags.push($(this).attr('id'));
+    });
+  
+    //Validate inputs
+    if(start==''){
+      $('#startBox').addClass('error');
+      $('#startBox').focus();
+      $.mobile.hidePageLoadingMsg();	
+      return false;
+    } else {
+      $('#startBox').removeClass('error');
+    }
+    
+    getWalkingTour(start);
+    return false;
+  });
+  $('#headerUpdate').submit(function() {
+    //Show loading
+    $.mobile.showPageLoadingMsg();
+    
+    var start = $('#headerInput').val();
+    $('#startBox').val(start);
+    getWalkingTour(start);
+    return false;
+  });
   
   $('body').show();
 
 });
+
+(function(){
+  var small = "(a|an|and|as|at|but|by|en|for|if|in|of|on|or|the|to|v[.]?|via|vs[.]?)";
+  var punct = "([!\"#$%&'()*+,./:;<=>?@[\\\\\\]^_`{|}~-]*)";
+  
+  this.titleCaps = function(title){
+    var parts = [], split = /[:.;?!] |(?: |^)["Ò]/g, index = 0;
+    
+    while (true) {
+      var m = split.exec(title);
+
+      parts.push( title.substring(index, m ? m.index : title.length)
+        .replace(/\b([A-Za-z][a-z.'Õ]*)\b/g, function(all){
+          return /[A-Za-z]\.[A-Za-z]/.test(all) ? all : upper(all);
+        })
+        .replace(RegExp("\\b" + small + "\\b", "ig"), lower)
+        .replace(RegExp("^" + punct + small + "\\b", "ig"), function(all, punct, word){
+          return punct + upper(word);
+        })
+        .replace(RegExp("\\b" + small + punct + "$", "ig"), upper));
+      
+      index = split.lastIndex;
+      
+      if ( m ) parts.push( m[0] );
+      else break;
+    }
+    
+    return parts.join("").replace(/ V(s?)\. /ig, " v$1. ")
+      .replace(/(['Õ])S\b/ig, "$1s")
+      .replace(/\b(AT&T|Q&A)\b/ig, function(all){
+        return all.toUpperCase();
+      });
+  };
+    
+  function lower(word){
+    return word.toLowerCase();
+  }
+    
+  function upper(word){
+    return word.substr(0,1).toUpperCase() + word.substr(1);
+  }
+})();
+
