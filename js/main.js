@@ -423,6 +423,7 @@ function otherPoints(){
       , 'city_hall'
       , 'embassy'
       , 'museum'
+      , 'natural_feature'
       , 'park'
       , 'stadium'
       , 'zoo'

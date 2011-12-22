@@ -253,13 +253,15 @@ label{
   }
   
   .ui-header #headerUpdate{
-    display:inline !important;
+    display:inline-block !important;
     vertical-align:super;
+    width:40%;
   }
   
   .ui-header #headerInput{
     display:inline-block !important;
-    width:40%;
+    width:73%;
+    vertical-align:top;
   }
 }
 
