@@ -417,7 +417,6 @@ function otherPoints(){
     , types: [
         'amusement_park'
       , 'aquarium'
-      , 'art_gallery'
       , 'bowling_alley'
       , 'casino'
       , 'cemetery'
