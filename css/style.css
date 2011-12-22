@@ -240,6 +240,10 @@ label{
     bottom:0;
   }
   
+  .ui-header{
+    max-height:46px;
+  }
+  
   .ui-header .edit{
     display:none !important;
   }
@@ -250,6 +254,7 @@ label{
   
   .ui-header #headerUpdate{
     display:inline !important;
+    vertical-align:super;
   }
   
   .ui-header #headerInput{
