@@ -1,12 +1,12 @@
 var map;
 var geocoder;
 var directionsDisplay;
+var placesService;
 var infoWindow;
 var lastWindow;
 var trip = {};
 var tagList = ["traditional", "architecture", "history", "museum", "neighborhood", "parks", "shopping", "views"];
 var tags =[];
-var categories = ['Shopping Mall','UNESCO World Heritage Site', 'Tourist Attraction', 'Scenic View', 'Ruins', 'Plaza', 'Palace', 'Monument', 'Historic', 'Fountain', 'Fort', 'City Walls', 'Castle', 'Battlefield', 'Archeological Site', 'Lake', 'Canyon', 'Beach', 'Vineyard', 'Distillery', 'Brewery', 'Theme Park', 'Go Karts', 'Circus', 'Miniature Golf', 'Museum', 'Bull Ring'];
 
 function shuffle(array) {
   var tmp, current, top = array.length;
@@ -246,6 +246,8 @@ function launchMap(){
   
   directionsService = new google.maps.DirectionsService();
   
+  placesService = new google.maps.places.PlacesService(map);
+  
   directionsDisplay = new google.maps.DirectionsRenderer({
     map: null,
     draggable: false,
@@ -408,86 +410,59 @@ function sfPoints(){
 }
 
 function otherPoints(){
-  var client = new simplegeo.PlacesClient('FCxs4Y5Au5YpndD2p5WFvtv5DvZhSv4G');
-    
-  var count = 0;  
   
-  categories = shuffle(categories);
-    
-  processPoints(categories);
-
-  function processPoints(categories){
-    client.search(trip.start.lat(), trip.start.lng(), {category: categories[count], radius: 4, num: 100}, function(err, data) {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(categories[count]);
-        for(var i=0; trip.waypoints.length<8 && i<data.features.length; i++){
-          var row = {
-            name: data.features[i].properties.name,
-            address: data.features[i].properties.address + ", " + data.features[i].properties.city,
-            tags: [],
-            coords: data.features[i].geometry.coordinates
-          }
+  placesService.search({
+      radius: 5000
+    , location: trip.start
+    , types: [
+        'amusement_park'
+      , 'aquarium'
+      , 'art_gallery'
+      , 'bowling_alley'
+      , 'casino'
+      , 'cemetery'
+      , 'city_hall'
+      , 'embassy'
+      , 'museum'
+      , 'park'
+      , 'stadium'
+      , 'zoo'
+      , 'point_of_interest'
+      ]
+  }, function(placesResponse){
+    console.log(placesResponse);
       
-          //Add state if present
-          if(data.features[i].properties.province){
-            row.address += ", " + data.features[i].properties.province;
-          } else if (data.features[i].properties.state){
-            row.address += ", " + data.features[i].properties.state;
-          }
+    $.each(placesResponse, function(i, poi){
+      var waypoint = {
+          name: poi.name
+        , address: poi.vicinity
+        , tags: poi.types
+        , icon: poi.icon
+        , coords: poi.geometry.location.lat() + ',' + poi.geometry.location.lng()
+        , distance: calculateDistance(trip.start.lat(), trip.start.lng(), poi.geometry.location.lat(), poi.geometry.location.lng())
+      }
+        
+      if(isUnique(waypoint.address)){
+        trip.waypoints.push(waypoint);
+      }
+    });
+    
+    //sort waypoints by distance
+    trip.waypoints.sort(function(a,b){ return ( a.distance - b.distance ) });
       
-          //Get tags from categories and subcategories
-          if(data.features[i].properties.tags){
-            $.each(data.features[i].properties.tags, function(index, tag){
-              row.tags.push(titleCaps(tag));
-            });
-          }
-          for(var j in data.features[i].properties.classifiers){
-            $.each(data.features[i].properties.classifiers[j], function(index, tag){
-              if(tag != ''){
-                row.tags.push(titleCaps(tag));
-              }
-            });
-          }
-          //Filter out stuff we don't want
-          if(filterCrap(row.tags)){
-            //Check to see if duplicate location
-            if(isUnique(row.coords)){
-              trip.waypoints.push(row);
-            }
-          }
-        }
-        if(trip.waypoints.length<8 && count < (categories.length-1)){
-          count++;
-          //Do another request
-          processPoints(categories);
-        } else {
-          getDirections();
-        }
-      }
-    }); 
-  }
+    //trim to 8 elements, due to limited waypoints in directions API
+    trip.waypoints.splice(8)
+      
+    getDirections();  
+  });
   
-  function filterCrap(tags){
-    var notCrap = true;
-    var exclude = ['Tourist Information', 'Parking', 'Promoter', 'Tours-Operators', 'Real Estate'];
-    for(var i in exclude){
-      if($.inArray(exclude[i], tags)!=-1){
-        notCrap = false;
+  function isUnique(address){
+    $.each(trip.waypoints, function(i, waypoint){
+      if(waypoint.address==address){
+        return false;
       }
-    }
-    return notCrap;
-  }
-  
-  function isUnique(coords){
-    var unique = true;
-    for(var i in trip.waypoints){
-      if(trip.waypoints[i].coords == coords){
-        unique = false;
-      }
-    }
-    return unique;
+    });
+    return true;
   }
 }
 
@@ -499,15 +474,18 @@ function getDirections(){
     return false;
   }
   
-  var addresses = [];
+  var waypoints = [];
   for(var i in trip.waypoints){
-    addresses.push({location: trip.waypoints[i].address});
+    //if coordinates are available, use these, otherwise use addresses
+    waypoints.push({
+      location: (trip.waypoints[i].coords) ? trip.waypoints[i].coords : trip.waypoints[i].address
+    });
   }
 
   var request = {
    origin: trip.start,
    destination: trip.start,
-   waypoints: addresses,
+   waypoints: waypoints,
    optimizeWaypoints: true,
    travelMode: google.maps.DirectionsTravelMode.WALKING
   };
@@ -594,7 +572,7 @@ function createPoint(waypoint){
       
       console.log(yelp);
     
-      infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a> <em>' + yelp.review_count + ' reviews on</em> <a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp" style="vertical-align:bottom;"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
+      infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ').replace('_', ' ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a> <em>' + yelp.review_count + ' reviews on</em> <a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp" style="vertical-align:bottom;"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
       
       $('#stop'+waypoint.index+' .image').html('<a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a>');
       $('#stop'+waypoint.index+' .rating')
@@ -694,7 +672,7 @@ function streetView(position) {
 }
 
 
-google.setOnLoadCallback(function(){
+$(document).ready(function(){
 
   resizeMobile();
   
@@ -747,49 +725,26 @@ google.setOnLoadCallback(function(){
     return false;
   });
   
-  $('body').show();
+  $('body').css('display', 'block');
 
 });
 
-(function(){
-  var small = "(a|an|and|as|at|but|by|en|for|if|in|of|on|or|the|to|v[.]?|via|vs[.]?)";
-  var punct = "([!\"#$%&'()*+,./:;<=>?@[\\\\\\]^_`{|}~-]*)";
-  
-  this.titleCaps = function(title){
-    var parts = [], split = /[:.;?!] |(?: |^)["Ò]/g, index = 0;
-    
-    while (true) {
-      var m = split.exec(title);
+calculateDistance = function(lat1, lon1, lat2, lon2) {
+  function ToRadians(degree) {
+    return (degree * (Math.PI / 180));
+  }
+  var radius = 3959.0; //Earth Radius in mi
+  var radianLat1 = ToRadians(lat1);
+  var radianLon1 = ToRadians(lon1);
+  var radianLat2 = ToRadians(lat2);
+  var radianLon2 = ToRadians(lon2);
+  var radianDistanceLat = radianLat1 - radianLat2;
+  var radianDistanceLon = radianLon1 - radianLon2;
+  var sinLat = Math.sin(radianDistanceLat / 2.0);
+  var sinLon = Math.sin(radianDistanceLon / 2.0);
+  var a = Math.pow(sinLat, 2.0) + Math.cos(radianLat1) * Math.cos(radianLat2) * Math.pow(sinLon, 2.0);
+  var d = radius * 2 * Math.asin(Math.min(1, Math.sqrt(a)));
+  return d;
+}
 
-      parts.push( title.substring(index, m ? m.index : title.length)
-        .replace(/\b([A-Za-z][a-z.'Õ]*)\b/g, function(all){
-          return /[A-Za-z]\.[A-Za-z]/.test(all) ? all : upper(all);
-        })
-        .replace(RegExp("\\b" + small + "\\b", "ig"), lower)
-        .replace(RegExp("^" + punct + small + "\\b", "ig"), function(all, punct, word){
-          return punct + upper(word);
-        })
-        .replace(RegExp("\\b" + small + punct + "$", "ig"), upper));
-      
-      index = split.lastIndex;
-      
-      if ( m ) parts.push( m[0] );
-      else break;
-    }
-    
-    return parts.join("").replace(/ V(s?)\. /ig, " v$1. ")
-      .replace(/(['Õ])S\b/ig, "$1s")
-      .replace(/\b(AT&T|Q&A)\b/ig, function(all){
-        return all.toUpperCase();
-      });
-  };
-    
-  function lower(word){
-    return word.toLowerCase();
-  }
-    
-  function upper(word){
-    return word.substr(0,1).toUpperCase() + word.substr(1);
-  }
-})();
 
