@@ -1,0 +1,22 @@
+.ui-footer, #credits, #home,
+#map-buttons, .ui-btn, .ui-btn-corner-all, 
+.ui-btn-inner, .actions, #streetview, a{
+    display: none;
+}
+
+#headerInput{
+    width: 100%;
+    height: 70px;
+    font-size: 30pt;
+    font-weight: bold;
+    border: 0;
+}
+
+#directions{
+    margin-top: 150px;
+}
+ 
+body{
+    font-family: sans-serif;
+
+}
