@@ -279,15 +279,32 @@ function launchMap(){
     trip.start = position.latLng;
     displayRoute();
   });
-  
-  var styledMapOptions = {
-    name: "walking"
+
+  //check for maptype parameter
+  if(window.location.search.indexOf('8bit') != -1){
+    var eightbitOptions = {
+      getTileUrl: function(coord, zoom) {
+        return "http://mt1.google.com/vt/lyrs=8bit,m@174000000&hl=en&src=app&s=Galil&" +
+        "z=" + zoom + "&x=" + coord.x + "&y=" + coord.y;
+      },
+      tileSize: new google.maps.Size(256, 256),
+      isPng: true
+    };
+      
+    var eightbitMapType = new google.maps.ImageMapType(eightbitOptions);
+    map.overlayMapTypes.insertAt(0, eightbitMapType);
+
+  } else {
+    var styledMapOptions = {
+      name: "walking"
+    }
+    
+    var walkingMapType = new google.maps.StyledMapType(styles, styledMapOptions);
+    
+    map.mapTypes.set('walking', walkingMapType);
+    map.setMapTypeId('walking');
   }
   
-  var walkingMapType = new google.maps.StyledMapType(styles, styledMapOptions);
-  
-  map.mapTypes.set('walking', walkingMapType);
-  map.setMapTypeId('walking');
 }
 
 
