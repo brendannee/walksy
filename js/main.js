@@ -519,7 +519,7 @@ function getDirections(){
      
      $.each(response.routes[0].legs, function(index, leg){
        if(index<response.routes[0].legs.length-1){
-         var waypointID = response.routes[0].optimized_waypoint_order[index];
+         var waypointID = response.routes[0].waypoint_order[index];
          
          //Add index value to waypoint
          trip.waypoints[waypointID].index = index;
