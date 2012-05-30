@@ -310,7 +310,6 @@ function launchMap(){
 
 function getWalkingTour(start) {
   geocoder.geocode({address:start}, function(data, status){
-    console.log(data);
     if(status == google.maps.GeocoderStatus.OK) {
       //put start location in headerbox
       $('#headerInput').val(data[0].formatted_address.replace(', USA',''))
@@ -587,8 +586,6 @@ function createPoint(waypoint){
       //Yelp had results, take the first one
       yelp = result.businesses[0];
       
-      console.log(yelp);
-    
       infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ').replace('_', ' ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a> <em>' + yelp.review_count + ' reviews on</em> <a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp" style="vertical-align:bottom;"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
       
       $('#stop'+waypoint.index+' .image').html('<a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a>');
