@@ -332,7 +332,7 @@ function getWalkingTour(start) {
 
 function resizeMobile(){
   //Check if window is landscape by looking and height and SVG support to decide if to show Profile
-  var mapheight;
+  var mapheight, mapwidth;
   if(isiPhone()){
     //Hide top address bar
     window.top.scrollTo(0, 1);
@@ -341,30 +341,39 @@ function resizeMobile(){
       mapheight = $(window).height()-40-parseInt($('#map .ui-header').css('height'));
     } else {
       mapheight = $(window).height()+60-parseInt($('#map .ui-header').css('height'));
+
     }
     panoheight = $(window).height()+60-parseInt($('#streetview .ui-header').css('height'));
   } else {
     //Not iphone
+      displayRoute();
     if($(window).height()>300 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
       //Show profile if enough room ans SVG supported
       mapheight = $(window).height()-100-parseInt($('#map .ui-header').css('height'));
+      mapwidth = $(window).width()-100-parseInt($('#map .ui-header').css('width'));
     } else {
       mapheight = $(window).height()-parseInt($('#map .ui-header').css('height'));
+      mapwidth = $(window).width()-parseInt($('#map .ui-header').css('width'));
     }
     panoheight = $(window).height()-parseInt($('#streetview .ui-header').css('height'));
   }
   $("#map_canvas").css('height',mapheight);
   $("#map").css('height',$(window).height());
+  $("#map").css('width',$(window).width() * 0.75);
   $("#pano").css('height',panoheight);
   $("#home").css('height',$(window).height());
   $("#credits").css('height',$(window).height());
+  
+  
+
+  
   if(map){
     google.maps.event.trigger(map,'resize');
   }
 }
 
 function displayRoute(){
-  clearMap();
+  //clearMap();
   
   generateLinks();
   
