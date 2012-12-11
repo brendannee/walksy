@@ -346,7 +346,6 @@ function resizeMobile(){
     panoheight = $(window).height()+60-parseInt($('#streetview .ui-header').css('height'));
   } else {
     //Not iphone
-      displayRoute();
     if($(window).height()>300 && document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1")==true){
       //Show profile if enough room ans SVG supported
       mapheight = $(window).height()-100-parseInt($('#map .ui-header').css('height'));
@@ -373,9 +372,7 @@ function resizeMobile(){
 }
 
 function displayRoute(){
-  //clearMap();
-  
-  generateLinks();
+  clearMap();
   
   //Check if in SF
   if(trip.start.lat() < 37.81 && trip.start.lat() > 37.71 && trip.start.lng() < -122.364 && trip.start.lng() > -122.517){
@@ -383,6 +380,8 @@ function displayRoute(){
   } else {
     otherPoints(); 
   }
+  generateLinks();
+
 }
 
 function clearMap(){
@@ -417,20 +416,23 @@ function sfPoints(){
     numRows = response.getDataTable().getNumberOfRows();
     numCols = response.getDataTable().getNumberOfColumns();
 
-    //create an array of row values and an array of addresses
-    for (var i = 0; i < numRows; i++) {
-      var row = {
-        name: response.getDataTable().getValue(i, 0),
-        address: response.getDataTable().getValue(i, 1),
-        tags: response.getDataTable().getValue(i, 2).split(',')
-      };
-      trip.waypoints.push(row);
-      
-      //When complete, proceed
-      if(i == (numRows-1)) {
-        getDirections();
-      }
+    if(trip && trip.waypoints) {
+      //create an array of row values and an array of addresses
+      for (var i = 0; i < numRows; i++) {
+        var row = {
+          name: response.getDataTable().getValue(i, 0),
+          address: response.getDataTable().getValue(i, 1),
+          tags: response.getDataTable().getValue(i, 2).split(',')
+        };
+        trip.waypoints.push(row);
+        
+        //When complete, proceed
+        if(i == (numRows-1)) {
+          getDirections();
+        }
+      }  
     }
+    
   });
 }
 
@@ -521,9 +523,11 @@ function getDirections(){
      directionsDisplay.setMap(map);
      
      //Do directions
-     $('#directions .content').html('<h2>Walking Tour starting from '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2><div class="summary"></div>');
+     $('#directions .content').html('');
      var totalDistance = 0;
      var totalDuration = 0;
+
+     var directionDiv = '<h2>Walking Tour starting from '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2><div class="summary"></div>';
      
      $.each(response.routes[0].legs, function(index, leg){
        if(index<response.routes[0].legs.length-1){
@@ -539,7 +543,7 @@ function getDirections(){
          //Assign coordinate from directions to waypoint
          trip.waypoints[waypointID].coordinate = leg.end_location;
          
-         var directionDiv = '<div id="stop' + index + '" class="waypoint">' +
+         directionDiv += '<div id="stop' + index + '" class="waypoint">' +
            '<h2>' + (index+1) + '. ' + trip.waypoints[waypointID].name + '</h2>' +
            '<div class="actions">' +
            '<a href="#streetview" onClick="streetView(new google.maps.LatLng('+leg.end_location.lat()+','+leg.end_location.lng()+'))" class="streetview btn" title="View on Google Streetview">StreetView</a>' +
@@ -554,10 +558,11 @@ function getDirections(){
            });
            
            directionDiv += '</ul></div>';
-         
-         $('#directions .content').append(directionDiv);
+
        }
      });
+
+     $('#directions .content, #directionsSidebar').append(directionDiv);
      
      //Add summary info
      trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
