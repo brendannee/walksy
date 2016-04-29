@@ -1,13 +1,13 @@
 Walksy
 =========
 
-Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by [Brendan Nee](http://bn.ee).  The source code is available on [github](https://github.com/brendannee/walksy).
+Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by [Brendan Nee](https://bn.ee).  The source code is available on [github](https://github.com/brendannee/walksy).
 
-Walksy.com makes walking tours of interesting things based on a specified start point.For walking tours staring in San Francisco, the points of interest come from a google Fusion table with hand-picked points of interest in San Francisco, CA by [Brendan Nee](http://bn.ee).  For all other starting locations, points of interest are pulled from SimpleGeo's Places API
+Walksy.com makes walking tours of interesting things based on a specified start point.For walking tours staring in San Francisco, the points of interest come from a google Fusion table with hand-picked points of interest in San Francisco, CA by [Brendan Nee](https://bn.ee).  For all other starting locations, points of interest are pulled from SimpleGeo's Places API
 
 ## Demo ##
 
-A live Demo is available at [http://walksy.com](http://walksy.com)
+A live Demo is available at [https://walksy.com](https://walksy.com)
 
 ### Features
 
@@ -24,7 +24,7 @@ A live Demo is available at [http://walksy.com](http://walksy.com)
 
 Brendan Nee  me@bn.ee
 
-### License 
+### License
 
 (The MIT License)
 

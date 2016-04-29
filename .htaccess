@@ -1,0 +1,9 @@
+RewriteEngine on
+
+#Force https
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://walksy.com/$1 [R,L]
+
+#Force non-www
+RewriteCond %{HTTP_HOST} ^www.walksy.com [NC]
+RewriteRule ^(.*)$ https://walksy.com/$1 [L,R=301]

@@ -49,7 +49,7 @@ function detectRouteFromURL(){
     //Show Homepage
     $.mobile.changePage($('#home'),"slide");
 
-    if(navigator.geolocation) {  
+    if(navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(getGeoLocator,showGeoLocatorError);
     }
   }
@@ -71,17 +71,17 @@ function getGeoLocator(position) {
     }
   });
 }
-  
+
 function showGeoLocatorError(error){
   if(error.code==1){
     console.log("To determine your current location you must click \"Share Location\" in the top bar in your browser.");
   } else if (error.code==2 || error.code==3 || error.code==0){
     console.log("Your current location couldn't be determined.  Please enter the start and end locations manually.");
-  } 
+  }
 }
 
 function launchMap(){
-  
+
   var styles = [
   {
       featureType: "road.arterial",
@@ -233,21 +233,21 @@ function launchMap(){
       ]
     }
   ];
-  
+
   map = new google.maps.Map(document.getElementById("map_canvas"), {
     zoom: 12,
     center: new google.maps.LatLng(37.777, -122.419),
     mapTypeId: google.maps.MapTypeId.ROADMAP
   });
-  
+
   geocoder = new google.maps.Geocoder();
-  
+
   infoWindow = new google.maps.InfoWindow();
-  
+
   directionsService = new google.maps.DirectionsService();
-  
+
   placesService = new google.maps.places.PlacesService(map);
-  
+
   directionsDisplay = new google.maps.DirectionsRenderer({
     map: null,
     draggable: false,
@@ -256,14 +256,14 @@ function launchMap(){
     zIndex: 100
     }
   });
-  
+
   //create start marker
   trip.startMarker = new google.maps.Marker({
     map: map,
     draggable:true,
     icon:  new google.maps.MarkerImage("images/green.png")
   });
-  
+
   //Events for start marker
   google.maps.event.addListener(trip.startMarker, 'click', function(position) {
     if(lastWindow) lastWindow.close(); //close the last window if it exists
@@ -284,13 +284,13 @@ function launchMap(){
   if(window.location.search.indexOf('8bit') != -1){
     var eightbitOptions = {
       getTileUrl: function(coord, zoom) {
-        return "http://mt1.google.com/vt/lyrs=8bit,m@174000000&hl=en&src=app&s=Galil&" +
+        return "https://mt1.google.com/vt/lyrs=8bit,m@174000000&hl=en&src=app&s=Galil&" +
         "z=" + zoom + "&x=" + coord.x + "&y=" + coord.y;
       },
       tileSize: new google.maps.Size(256, 256),
       isPng: true
     };
-      
+
     var eightbitMapType = new google.maps.ImageMapType(eightbitOptions);
     map.overlayMapTypes.insertAt(0, eightbitMapType);
 
@@ -298,13 +298,13 @@ function launchMap(){
     var styledMapOptions = {
       name: "walking"
     }
-    
+
     var walkingMapType = new google.maps.StyledMapType(styles, styledMapOptions);
-    
+
     map.mapTypes.set('walking', walkingMapType);
     map.setMapTypeId('walking');
   }
-  
+
 }
 
 
@@ -313,14 +313,14 @@ function getWalkingTour(start) {
     if(status == google.maps.GeocoderStatus.OK) {
       //put start location in headerbox
       $('#headerInput').val(data[0].formatted_address.replace(', USA',''))
-      
+
       $.mobile.changePage($('#map'),"slide");
-      
+
       map.panTo(data[0].geometry.location);
-      
+
       //Assign position to start marker
       trip.startMarker.setPosition(data[0].geometry.location);
-      
+
       trip.start = data[0].geometry.location;
       displayRoute();
 
@@ -365,14 +365,14 @@ function resizeMobile(){
 
 function displayRoute(){
   clearMap();
-  
+
   generateLinks();
-  
+
   //Check if in SF
   if(trip.start.lat() < 37.81 && trip.start.lat() > 37.71 && trip.start.lng() < -122.364 && trip.start.lng() > -122.517){
     sfPoints();
   } else {
-    otherPoints(); 
+    otherPoints();
   }
 }
 
@@ -381,30 +381,30 @@ function clearMap(){
   for(i in trip.markerArray){
     trip.markerArray[i].setMap(null);
   }
-  
+
   trip.markerArray = [];
   trip.waypoints = [];
   directionsDisplay.setMap(null);
-  
+
   //close the last infowindow if it exists
   if(lastWindow) lastWindow.close();
 }
 
 function generateLinks(){
-  $('#permalink a').attr('href','http://walksy.com/?start='+encodeURIComponent($('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+  $('#permalink a').attr('href','https://walksy.com/?start='+encodeURIComponent($('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")));
 
-  $("#twitter a").attr("href","http://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("http://walksy.com/"+$('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")));
+  $("#twitter a").attr("href","https://www.addtoany.com/add_to/twitter?linkurl=" + encodeURIComponent("https://walksy.com/"+$('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")) + "&linkname=" + encodeURIComponent("Walking Tour of San Francisco starting at " + $('#startBox').val().replace(/\+/g, " ").replace(/&/g, "and")));
 }
 
 function sfPoints(){
   //Generate random number for query offset to randomize trips
   var random = Math.floor(Math.random()*4);
-  
+
   //Google Fusion Table ID
   var tableid = 611081;
-  
-  new google.visualization.Query('http://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+trip.start.lat()+","+trip.start.lng()+")) OFFSET " + random + " LIMIT 8")).send(function(response){
-    
+
+  new google.visualization.Query('https://www.google.com/fusiontables/gvizdata?tq=' + encodeURIComponent("SELECT name, address, tags FROM "+tableid+" ORDER BY ST_DISTANCE(address, LATLNG("+trip.start.lat()+","+trip.start.lng()+")) OFFSET " + random + " LIMIT 8")).send(function(response){
+
     numRows = response.getDataTable().getNumberOfRows();
     numCols = response.getDataTable().getNumberOfColumns();
 
@@ -416,7 +416,7 @@ function sfPoints(){
         tags: response.getDataTable().getValue(i, 2).split(',')
       };
       trip.waypoints.push(row);
-      
+
       //When complete, proceed
       if(i == (numRows-1)) {
         getDirections();
@@ -426,7 +426,7 @@ function sfPoints(){
 }
 
 function otherPoints(){
-  
+
   placesService.search({
       radius: 5000
     , location: trip.start
@@ -447,7 +447,7 @@ function otherPoints(){
       ]
   }, function(placesResponse){
     console.log(placesResponse);
-      
+
     $.each(placesResponse, function(i, poi){
       var waypoint = {
           name: poi.name
@@ -457,21 +457,21 @@ function otherPoints(){
         , coords: poi.geometry.location.lat() + ',' + poi.geometry.location.lng()
         , distance: calculateDistance(trip.start.lat(), trip.start.lng(), poi.geometry.location.lat(), poi.geometry.location.lng())
       }
-        
+
       if(isUnique(waypoint.address)){
         trip.waypoints.push(waypoint);
       }
     });
-    
+
     //sort waypoints by distance
     trip.waypoints.sort(function(a,b){ return ( a.distance - b.distance ) });
-      
+
     //trim to 8 elements, due to limited waypoints in directions API
     trip.waypoints.splice(8)
-      
-    getDirections();  
+
+    getDirections();
   });
-  
+
   function isUnique(address){
     $.each(trip.waypoints, function(i, waypoint){
       if(waypoint.address==address){
@@ -489,7 +489,7 @@ function getDirections(){
     alert('No points of interest found');
     return false;
   }
-  
+
   var waypoints = [];
   for(var i in trip.waypoints){
     //if coordinates are available, use these, otherwise use addresses
@@ -507,29 +507,29 @@ function getDirections(){
   };
   directionsService.route(request, function(response, status) {
    if(status == google.maps.DirectionsStatus.OK) {
-     
+
      directionsDisplay.setDirections(response);
      directionsDisplay.setMap(map);
-     
+
      //Do directions
      $('#directions .content').html('<h2>Walking Tour starting from '+response.routes[0].legs[0].start_address.replace(/, USA/g, "")+'</h2><div class="summary"></div>');
      var totalDistance = 0;
      var totalDuration = 0;
-     
+
      $.each(response.routes[0].legs, function(index, leg){
        if(index<response.routes[0].legs.length-1){
          var waypointID = response.routes[0].waypoint_order[index];
-         
+
          //Add index value to waypoint
          trip.waypoints[waypointID].index = index;
-         
+
          //Sum the distace and duration
          totalDistance += leg.distance.value;
          totalDuration += leg.duration.value;
-          
+
          //Assign coordinate from directions to waypoint
          trip.waypoints[waypointID].coordinate = leg.end_location;
-         
+
          var directionDiv = '<div id="stop' + index + '" class="waypoint">' +
            '<h2>' + (index+1) + '. ' + trip.waypoints[waypointID].name + '</h2>' +
            '<div class="actions">' +
@@ -539,28 +539,28 @@ function getDirections(){
            '<div class="image"></div>' +
            '<div class="distance">Walk ' + leg.distance.text + '</div>' +
            '<ul class="directions">';
-           
+
            $.each(leg.steps, function(i, step){
              directionDiv += '<li>'+step.instructions+'</li>';
            });
-           
+
            directionDiv += '</ul></div>';
-         
+
          $('#directions .content').append(directionDiv);
        }
      });
-     
+
      //Add summary info
      trip.distance = Math.round(totalDistance/1609.344*10)/10 + " miles";
      trip.duration = Math.floor(totalDuration/60) + " minutes";
      $('#directions .summary').html(trip.distance + ", " + trip.duration + ", " + (response.routes[0].legs.length-1) + " stops");
      $('#map h1').html(trip.distance + '<span>, ' + trip.waypoints.length + ' stops</span>');
-     
+
      //Create Points
      for (var i in trip.waypoints){
        createPoint(trip.waypoints[i]);
      }
-     
+
      getElevation(response);
    } else {
      console.log(response);
@@ -578,16 +578,16 @@ function createPoint(waypoint){
     limit: 1,
     ywsid: '00zW70MC_sCMJIpsokD0hQ'
   }
-  $.getJSON('http://api.yelp.com/business_review_search?&callback=?', options, function(result){    
+  $.getJSON('https://api.yelp.com/business_review_search?&callback=?', options, function(result){
     var infoWindowContent;
-    
+
     //Check if any results then create the marker
     if(result.businesses.length>0){
       //Yelp had results, take the first one
       yelp = result.businesses[0];
-      
+
       infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ').replace('_', ' ') + '<br><a href="' + yelp.url + '" title="View on Yelp"><img src="' + yelp.rating_img_url_small + '" alt="View reviews on Yelp"></a> <em>' + yelp.review_count + ' reviews on</em> <a href="' + yelp.url + '" title="View reviews on Yelp"><img src="images/yelp_logo.png" alt="View reviews on Yelp" style="vertical-align:bottom;"></a><br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
-      
+
       $('#stop'+waypoint.index+' .image').html('<a href="' + yelp.url + '" title="View reviews on Yelp"><img src="' + yelp.photo_url +'" class="thumb"></a>');
       $('#stop'+waypoint.index+' .rating')
         .html('<img src="' + yelp.rating_img_url_small + '" alt="Yelp Rating""> <em>' + yelp.review_count + ' reviews on</em> <img src="images/yelp_logo.png" alt="Yelp" style="vertical-align:bottom;">')
@@ -596,7 +596,7 @@ function createPoint(waypoint){
       //Couldn't find on yelp
       infoWindowContent = '<div id="marker' + waypoint.index + '" class="marker"><strong>' + waypoint.name + '</strong><br>' + waypoint.address + '<br>Tags: ' + waypoint.tags.join(', ') + '<br><a href="#streetview" onClick="streetView(new google.maps.LatLng(' + waypoint.coordinate.lat() + ',' + waypoint.coordinate.lng() + '))">StreetView</a></div>';
     }
-    
+
     var options = {
       position: waypoint.coordinate,
       content: infoWindowContent,
@@ -620,11 +620,11 @@ function getElevation(response){
   var elevationService = new google.maps.ElevationService();
   // Create a new chart in the elevation_chart DIV.
   chart = new google.visualization.ColumnChart(document.getElementById('elevation_chart'));
-  
+
   elevationService.getElevationAlongPath({path: response.routes[0].overview_path, samples:200}, function(results, status){
     if (status == google.maps.ElevationStatus.OK) {
       elevations = results;
-      
+
       // Extract the elevation samples from the returned results
       // and store them in an array of LatLngs.
       var elevationPath = [];
@@ -661,10 +661,10 @@ function getElevation(response){
         titleY: 'Elevation (ft)',
         titleX: trip.distance
       });
-      
+
       //Remove loading screen
       $.mobile.hidePageLoadingMsg();
-      
+
     }
   });
 }
@@ -689,14 +689,14 @@ function streetView(position) {
 $(document).ready(function(){
 
   resizeMobile();
-  
+
   launchMap();
 
   //Resize map when map page is shown
   $("#map_canvas").parent().bind('pageshow',resizeMobile);
-  
+
   $("#pano").parent().bind('pageshow',resizeMobile);
-  
+
   //Resize map when orientation is changed
   $(window).bind('resize',function(e){
     resizeMobile();
@@ -704,41 +704,41 @@ $(document).ready(function(){
   });
 
   detectRouteFromURL();
-  
+
   $('#inputs').submit(function(){
     //Show loading
     $.mobile.showPageLoadingMsg();
     $('#inputs input').blur();
-  
+
     var start = $('#startBox').val();
-    tags = []; 
+    tags = [];
     $('#tags :checked').each(function(){
       tags.push($(this).attr('id'));
     });
-  
+
     //Validate inputs
     if(start==''){
       $('#startBox').addClass('error');
       $('#startBox').focus();
-      $.mobile.hidePageLoadingMsg();	
+      $.mobile.hidePageLoadingMsg();
       return false;
     } else {
       $('#startBox').removeClass('error');
     }
-    
+
     getWalkingTour(start);
     return false;
   });
   $('#headerUpdate').submit(function() {
     //Show loading
     $.mobile.showPageLoadingMsg();
-    
+
     var start = $('#headerInput').val();
     $('#startBox').val(start);
     getWalkingTour(start);
     return false;
   });
-  
+
   $('body').css('display', 'block');
 
 });
@@ -760,5 +760,3 @@ calculateDistance = function(lat1, lon1, lat2, lon2) {
   var d = radius * 2 * Math.asin(Math.min(1, Math.sqrt(a)));
   return d;
 }
-
-

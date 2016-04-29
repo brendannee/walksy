@@ -3,27 +3,27 @@
 <head>
   <meta charset="utf-8">
   <title>Walksy.com - Walking tours on the Fly</title>
-  <link href='http://fonts.googleapis.com/css?family=PT+Sans+Caption:regular,bold&amp;subset=latin' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans+Caption:regular,bold&amp;subset=latin' rel='stylesheet' type='text/css'>
   <meta name="description" content="Walksy.com leads you on great walking trips around your city" />
-  
+
   <meta name="HandheldFriendly" content="True">
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="cleartype" content="on">
-  
+
   <link rel="stylesheet" href="css/style.css" media="screen" />
   <link rel="stylesheet" href="css/jquery.mobile-1.0.min.css" media="screen" />
   <link rel="stylesheet" href="css/print.css" type="textcss" media="print" />
 </head>
 <body>
-  
-  
-  <div data-role="page" data-theme="b" id="home"> 
+
+
+  <div data-role="page" data-theme="b" id="home">
     <div data-role="header" data-backbtn="false">
       <div class="logo"><img src="images/walksy.png" alt="Walksy.com"> <div class="tagline">Walking Tours on the Fly</div></div>
-    </div> 
+    </div>
 
-    <div data-role="content"> 
+    <div data-role="content">
       <form id="inputs" method="post" action="">
         <div class="additionalInfo">
           <img src="images/walksy-screenshot.jpg" class="screenshot">
@@ -59,15 +59,15 @@
             <label for="views">Views</label>
           </fieldset>
         </div>-->
-        
+
         <input id="submit" type="submit" value="Plan my Walk" title="Plan my Walk">
       </form>
-    </div> 
+    </div>
     <div data-role="footer">
       <a href="#credits" data-role="button" data-icon="info">Credits</a>
     </div>
   </div>
-  
+
   <div data-role="page" data-theme="a" id="map">
     <div data-role="header">
       <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse" class="edit">Edit</a>
@@ -85,7 +85,7 @@
       <div id="twitter" class="map-button"><a href='' rel='external'><img src='images/twitter.png'> Tweet This</a></div>
     </div>
   </div>
-  
+
   <div data-role="page" data-theme="a" id="streetview" style="height:100%">
     <div data-role="header">
       <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
@@ -94,7 +94,7 @@
     </div>
     <div id="pano" data-role="content" style="padding:0;"></div>
   </div>
-  
+
   <div data-role="page" data-theme="a" id="directions">
     <div data-role="header">
       <a href="#home" data-role="button" data-icon="gear" data-transition="slide" data-direction="reverse">Edit</a>
@@ -104,40 +104,40 @@
     <div data-role="content" class="content">
     </div>
   </div>
-  
+
   <div data-role="page" data-theme="b" id="credits">
     <div data-role="header">
       <a href="#home" data-role="button" data-icon="arrow-l" data-direction="reverse">Back</a>
       <h1>Credits</h1>
     </div>
     <div data-role="content">
-      <p>Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by <a href="http://bn.ee">Brendan Nee</a>.  The source code is <a href="https://github.com/brendannee/walksy">available on github</a>.</p>
-      <p>Walksy.com makes walking tours of interesting things based on a specified start point.For walking tours staring in San Francisco, the points of interest come from a google Fusion table with hand-picked points of interest in San Francisco, CA by <a href="http://bn.ee">Brendan Nee</a>.  For all other starting locations, points of interest are pulled from SimpleGeo's Places API.</p>
+      <p>Walksy.com was created for the Google I/O Last Call Maps/Geo Round 2 Challenge by <a href="https://bn.ee">Brendan Nee</a>.  The source code is <a href="https://github.com/brendannee/walksy">available on github</a>.</p>
+      <p>Walksy.com makes walking tours of interesting things based on a specified start point.For walking tours staring in San Francisco, the points of interest come from a google Fusion table with hand-picked points of interest in San Francisco, CA by <a href="https://bn.ee">Brendan Nee</a>.  For all other starting locations, points of interest are pulled from SimpleGeo's Places API.</p>
       <p>If you like this app, you might like some of the other transportation web apps Brendan has created:</p>
       <ul>
-        <li><a href="http://bikesy.com">Bikesy.com</a> - customized bike route directions for the San Francisco Bay Area based on data from OpenStreetMap</li>
+        <li><a href="https://bikesy.com">Bikesy.com</a> - customized bike route directions for the San Francisco Bay Area based on data from OpenStreetMap</li>
         <li><a href="http://modepick.com">Modepick.com</a> - calculate the time, distance and cost for a trip including walking, biking, carshare, transit, taxi, Amtrak and Greyhound for any two points in the US.
       </ul>
     </div>
     <div data-role="footer">
     </div>
   </div>
-  
-  <script src="http://www.google.com/jsapi?key=ABQIAAAA7ryB86mtzsqx_XU57t8PNhTMTGztSySO4_rR2h0VlHQYebwNHBQfKBMwuobg9gRDpM6rxsFgfXCnug"></script>
+
+  <script src="https://www.google.com/jsapi?key=ABQIAAAA7ryB86mtzsqx_XU57t8PNhTMTGztSySO4_rR2h0VlHQYebwNHBQfKBMwuobg9gRDpM6rxsFgfXCnug"></script>
 
   <script>
-    google.load("maps", "3.x",{"other_params":"sensor=true&libraries=places"});
+    google.load("maps", "3.x",{"other_params":"libraries=places"});
     google.load("jquery", "1.7");
     google.load("jqueryui", "1.8.11");
     google.load('visualization', '1', {packages:['corechart']});
   </script>
-  
+
   <script src="js/jquery.mobile-1.0.min.js"></script>
-  
+
   <script src="js/helper.js"></script>
-  
+
   <script src="js/main.js"></script>
-  
+
   <script>
     // iPhone Scale Bug Fix, read this when using http://www.blog.highub.com/mobile-2/a-fix-for-iphone-viewport-scale-bug/
     window.onload = function() {
@@ -145,13 +145,13 @@
         MBP.hideUrlBar();
     }
   </script>
-  
+
   <script>
     var _gaq=[["_setAccount","UA-306190-17"],["_trackPageview"]];
     (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
     g.src=("https:"==location.protocol?"//ssl":"//www")+".google-analytics.com/ga.js";
     s.parentNode.insertBefore(g,s)}(document,"script"));
   </script>
-  
+
 </body>
 </html>
